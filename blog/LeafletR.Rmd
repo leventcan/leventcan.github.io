@@ -1,0 +1,156 @@
+---
+title: "Leaflet ile İnteraktif Haritalar"
+description: "Leaflet, interaktif haritalar oluşturmak için en popüler, açık kaynaklı JavaScript kütüphanelerinden birisidir. R için  geliştirilen Leaflet paketi ile Leaflet haritaları R'a kolayca entegre edilebilmektedir."
+date: '2017-11-05'
+type: "post"
+tags: [
+ "Leaflet",
+ "Veri Görselleştirme"
+]
+keywords: [
+"Leaflet"
+]
+thumbnailImagePosition: "left"
+thumbnailImage: "//res.cloudinary.com/dyv5c62ez/image/upload/c_scale,h_800,w_964/v1514645208/chloropleth_leafletjs_web_qskv3p.png"
+
+slug: "leaflet"
+coverImage: /
+draft: false
+output:
+  md_document:
+    variant: markdown
+---
+
+<style>
+body {
+text-align: justify}
+</style>
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,warning=FALSE, message=FALSE, collapse = TRUE, fig.align='center')
+```
+
+
+```{r, include = FALSE}
+htmltools::tagList(rmarkdown::html_dependency_font_awesome())
+```
+
+
+## Leaflet-R
+
+[Leaflet](http://leafletjs.com/) özellikle web tabanlı interaktif haritalama işlemlerinde en sık kullanılan JavaScript kütüphanelerinden birisidir. Rstudio tarafından geliştirilen aynı isimdeki [Leaflet](https://rstudio.github.io/leaflet/) paketi ile R üzerinden de Leaflet haritaları oluşturulabilmektedir. 
+
+```{r }
+#Gerekli kütüphanelerin aktif hale getirilmesi
+library(leaflet)
+library(dplyr)
+
+```
+
+En basit haliyle interaktif bir haritayı aşağıdaki şekilde oluşturabiliriz.
+
+
+```{r}
+#Leaflet
+m <- leaflet(width = 720) %>%
+  addTiles() %>%  
+  addMarkers(lng=32.860156, lat=39.901967, popup="Kuğulu Park")
+m  
+```
+<br>
+Yukarıdaki basit örnekte gereken koordinatları vererek Ankara Kuğulu Park'ı gösterdim. Paket içerisinde kullanılan Syntax'da dikkat edildiği üzere, `magrittr` paketindeki yaklaşımda olan "%>%" pipeline operatorler kullanılmaktadır. Pipe operatorları kullanmak istemeyen birisi bu kodları iç içe geçmiş fonksiyonlar olarak da ifade edebilir. Yukarıda görüldüğü üzere oluşan Leaflet harita tamamen interaktifdir. Zoom yapılabilmekte, haritadaki diğer alanlar da Google Map uygulamasında olduğu gibi incelenebilmektedir. Haritanızı HTML formatında dışarı aktarmanız durumunda, kendi web sayfanıza kolaylıkla gömüleyebilirsiniz. Haritanın sağ altında harita sağlayıcısı (map provider) adı görülmektedir. Kütüphane otomatik olarak OpenStreetMap harita sağlayıcısını kullanmıştır. Buna benzer birçok sağlayıcıyı bulunmaktadır, her birinin farklı görsel tasarımları vardır. Haritayı oluştururken kullandığımız kodun içerisine istediğimiz harita sağlayıcısı bilgisini girdiğimizde leaflet haritası buna bağlı olarak farklılaşabilmektedir. Aşağıdaki örnekte Stamen sağlayıcısını kullanıyorum. Diğer farklı sağlayıcılara ilişkin bilgiler [Leaflet](https://rstudio.github.io/leaflet/) adresinde bulunabilir.
+
+
+```{r}
+#Stamen Leaflet
+m %>% addProviderTiles(providers$Stamen.Toner)
+```
+
+<br>
+Yukarıdaki yapılan işlem özünde nokta verilerinin görselleştirmesi ile ilgilidir. Fakat analizlerde belirli coğrafi alanı gösteren (il, bölge) renk tonlu tematik (choropleth) haritalar da sıkça kullanılmaktadır. Fakat burada öncelikle leaflet haritasının üstüne göstermek istediğimiz coğrafi alana ilişkin harita dosyasına ihtiyaç bulunmaktadır. Harita dosyası yerleştirildikten sonra geriye incelemek istediğimiz herhangi bir değişkene göre coğrafi alanların renklendirilmesi kalmaktadır.
+
+Aşağıdaki örnekte Türkiye'deki 81 ile ilişkin işsizlik oranı durumlarını (2013 yılı itibariyle) Leaflet üzerinden tematik haritaya dökmek istiyorum. İlk iş olarak öncelikle ESRI Shapefile (.shp) formatındaki harita dosayasını yüklüyorum. Türkiye için il baszndaki Shapefile harita dosyaları internette aramayla kolayca bulunabilmektedir. Shapefile dosyasından farklı olarak JSON veya TopoJSON formatında tutulan verilerde kullanılabilir.
+
+Ardından [TÜİK](http://bit.ly/2j4lnU8)'den  il bazında indirmiş olduğum  işsizlik oranı verilerini harita dosyamla eşleştiriyorum. Devamında oluşturduğum veri objesini Leaflet kodumun içerisinde belirterek tematik haritayı yaratıyorum.
+
+
+```{r, echo=FALSE}
+# Gerekli kütühanelerin aktif hale getirilmesi
+library(readxl)
+library(rgdal)
+
+#Verilerin olduğu excel dosyasının import edilmesi
+dataset_unemp <- read_excel("C:/--DOSYALARIM/R-Projects/Github_Page/website-hugo/static/Veri/TR3-Issizlik.xlsx")
+
+#Harita ShapeFile dosyasının alınması
+il_harita <- readOGR(dsn ="C:/--DOSYALARIM/R-Projects/Github_Page/website-hugo/static/Veri/TUR_NUTS_3.shp")
+```
+
+
+
+```{r, eval=FALSE}
+# Gerekli kütühanelerin aktif hale getirilmesi
+library(readxl)
+library(rgdal)
+
+#Verilerin olduğu excel dosyasının import edilmesi
+dataset_unemp <- read_excel("TR3-Issizlik.xlsx")
+
+#Harita ShapeFile dosyasının alınması
+il_harita <- readOGR(dsn ="TUR_NUTS_3.shp")
+```
+
+Öncelikle indirdiğimiz harita dosyasının içerisinde incelemek istediğimiz verilerin anahtar kodlara uygun olarak yerleştirilmesi gerekmektedir. Harita dosyaları SpatialPolygonDataFrame sınıfında yani "list" tarzı objeler olduğu için sıradan DataFrame objelerinden farklı olarak merge işleminde  `data` slotuna verilerin yerleştirilmesi gerekmektedir.
+
+```{r}
+#Harita verisini ayrı bir isimde kayedilmesi
+merged.data.spatial <- il_harita
+merged.data.spatial@data$rec <- 1:nrow(merged.data.spatial@data)
+merged.data.spatial@data$NUTS_ID <- as.character(merged.data.spatial@data$NUTS_ID)
+tmp <- inner_join(merged.data.spatial@data, dataset_unemp, by=c("NUTS_ID"="TRKOD")) %>% arrange(rec)
+merged.data.spatial@data <- tmp
+```
+
+Verileri yerleştirdikten sonra geriye görselleştirme esnasında kullanacağımız bazı parametrelere ilişkin objeleri oluşturmak kalmaktadır. 
+
+```{r}
+#Lejand kırımlarının belirlenmesi
+bins <- c(4,6,8,10,15,20,Inf)
+#Lejandın oluşturulması
+pal2 <- colorBin("viridis",  domain = merged.data.spatial$ISSIZLIKORAN, bins = bins,
+                 reverse = TRUE)
+
+#Etiketlerin oluşturulması
+labels <- sprintf(
+  "<strong>%s</strong><br/>İşsizlik Oranı: %g",
+  merged.data.spatial$ILADI, merged.data.spatial$ISSIZLIKORAN) %>% lapply(htmltools::HTML)
+```
+
+Veriler ve parametreler tamamlandıktan sonra artık leaflet haritamızı oluşturabiliriz. `addPolygons` fonksiyonunun içerisinde çizgi tipleri, saydamlığa ve bazı interaktivite detaylarına ilişkin parametreleri tanımlıyoruz.
+
+```{r, fig.align='center'}
+leaflet(options = leafletOptions(minZoom = 5, maxZoom = 18), width=720) %>%
+  addPolygons(data= merged.data.spatial, color = "#444444", weight = 1, smoothFactor = 0.5, dashArray="",
+              opacity = 1.0, fillOpacity = 0.7, fillColor = ~pal2(merged.data.spatial$ISSIZLIKORAN),
+              highlightOptions = highlightOptions(color = "white", weight = 2,
+                                                  dashArray = "",
+                                                  fillOpacity = 1,
+                                                  bringToFront = TRUE),
+              label = labels,
+              labelOptions = labelOptions(
+                style = list("font-weight" = "normal", padding = "3px 8px"),
+                textsize = "12px",
+                direction = "auto")) %>% 
+  
+   addLegend(pal = pal2, values = merged.data.spatial$ISSIZLIKORAN, opacity = 0.7, title = NULL,
+    position = "bottomright") %>%
+  
+  
+  addProviderTiles(providers$CartoDB.Positron)
+```
+
+
+
+
+

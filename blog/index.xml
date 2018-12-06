@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Blog on Leventcan Gültekin</title>
+    <link>/blog/</link>
+    <description>Recent content in Blog on Leventcan Gültekin</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>tr</language>
+    <lastBuildDate>Sat, 22 Aug 2015 06:42:21 -0700</lastBuildDate>
+    
+	<atom:link href="/blog/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Türkiye&#39;de Bölgeler Arası Göç Akışları</title>
+      <link>/blog/t%C3%BCrkiye_goc/</link>
+      <pubDate>Sun, 15 Jul 2018 00:00:00 +0000</pubDate>
+      
+      <guid>/blog/t%C3%BCrkiye_goc/</guid>
+      <description>body {text-align: justify}Veri Hazırlık AşamasıTÜİK’in websitesindeki veritabanları bölümünde iller arasıdaki göç matrisi, istenilen yıl detayında oluşturulup indirilebilmektedir.
+library(readxl)#Verilerin olduğu excel dosyasının içe aktarılmasınuts3_goc &amp;lt;- read_excel(&amp;quot;nuts3_goc.xlsx&amp;quot;, sheet = &amp;quot;data&amp;quot;)nuts3_goc$YIL &amp;lt;- as.integer(nuts3_goc$YIL)#İBBS tipolojisi ile eşleştirme yapmak içintrkod &amp;lt;- read_excel(&amp;quot;trkod.xlsx&amp;quot;)´nuts3_goc´ dataframe objesinde yer alan göç matrisinin görünümü aşağıdaki şekildedir.
+head(nuts3_goc)## # A tibble: 6 x 83## YIL FROM_IL Adana Adıyaman Afyonkarahisar Ağrı Aksaray Amasya Ankara## &amp;lt;int&amp;gt; &amp;lt;chr&amp;gt; &amp;lt;dbl&amp;gt; &amp;lt;dbl&amp;gt; &amp;lt;dbl&amp;gt; &amp;lt;dbl&amp;gt; &amp;lt;dbl&amp;gt; &amp;lt;dbl&amp;gt; &amp;lt;dbl&amp;gt;## 1 2015 Adana 0 816 342 263 389 159 3764## 2 2015 Adıyam~ 905 0 92 136 68 40 986## 3 2015 Afyonk~ 235 67 0 118 65 62 1921## 4 2015 Ağrı 247 129 189 0 95 89 2749## 5 2015 Aksaray 459 54 140 39 0 50 1956## 6 2015 Amasya 129 40 48 101 29 0 1982## # .</description>
+    </item>
+    
+    <item>
+      <title>Twitter ile İçerik Analizi</title>
+      <link>/blog/twitter-ile-i%C3%A7erik-analizi/</link>
+      <pubDate>Sat, 31 Mar 2018 00:00:00 +0000</pubDate>
+      
+      <guid>/blog/twitter-ile-i%C3%A7erik-analizi/</guid>
+      <description>body {text-align: justify}İçerik Analizi“Twitter ile Sosyal Ağ Analizi” içerikli ilk blog paylaşımımda R programlama dili kullanarak Twitter API’sinden nasıl veri çekilebileceği ve bu veriler ile sosyal ağların nasıl görselleştirilebileceği üzerinde durmuştuk.
+Twitter’dan elde edilen verilerin sosyal ağları göstermesinin yanında diğer bir özelliğide atılan tweetlerin mutlak olarak belirli bir içeriği yansıtmasıdır.
+Bu sebeple bu paylaşımımda Twitter’dan elde edilen veriler üzerinden basit bir içerik analizi yapmayı deneyeceğim.</description>
+    </item>
+    
+    <item>
+      <title>Twitter ile Sosyal Ağ Analizi</title>
+      <link>/blog/twitter-ile-sosyal-a%C4%9F-analizi/</link>
+      <pubDate>Sun, 18 Mar 2018 00:00:00 +0000</pubDate>
+      
+      <guid>/blog/twitter-ile-sosyal-a%C4%9F-analizi/</guid>
+      <description>body {text-align: justify}Twitter APIGünümüzde giderek kompleksleşen sosyal ilişkiler bu ilişkilerin ağ felsefesinde incelenmesi ihtiyacını ortaya çıkarmaktadır. Sosyal ağlara yapısına ilişkin veriler geçmişte anketler ve diğer ikincil kaynaklardan bulunmakta ve erişimi çok zor ve zahmetli iken, günümüzde Twitter, Facebook, Youtube gibi devasa sosyal medya platformlarının ön plana çıkmasıyla bu platformlardan üretilen ve ağ yapısını gösteren verilere kolayca erişilebilmektedir.
+Bu ortamlarda üretilen veriler geliştirici ve kullanıcılara API (Application Program Interface) olarak adlandırılan kanallar üzerinden verilmektedir.</description>
+    </item>
+    
+    <item>
+      <title>Leaflet ile İnteraktif Haritalar</title>
+      <link>/blog/leaflet/</link>
+      <pubDate>Sun, 05 Nov 2017 00:00:00 +0000</pubDate>
+      
+      <guid>/blog/leaflet/</guid>
+      <description>body {text-align: justify}Leaflet-RLeaflet özellikle web tabanlı interaktif haritalama işlemlerinde en sık kullanılan JavaScript kütüphanelerinden birisidir. Rstudio tarafından geliştirilen aynı isimdeki Leaflet paketi ile R üzerinden de Leaflet haritaları oluşturulabilmektedir.
+#Gerekli kütüphanelerin aktif hale getirilmesilibrary(leaflet)library(dplyr)En basit haliyle interaktif bir haritayı aşağıdaki şekilde oluşturabiliriz.
+#Leafletm &amp;lt;- leaflet(width = 720) %&amp;gt;%addTiles() %&amp;gt;% addMarkers(lng=32.</description>
+    </item>
+    
+    <item>
+      <title>Dünya Bankası ve OECD API&#39;si İle Veri Analizi</title>
+      <link>/blog/world-bank/</link>
+      <pubDate>Fri, 03 Nov 2017 00:00:00 +0000</pubDate>
+      
+      <guid>/blog/world-bank/</guid>
+      <description>body {text-align: justify}Dünya Bankası ve OECD API’leriAPI sistemi (Application Programing Interfaces - Uygulama Programlama Arayüzleri) en kısa hali ile iki yazılımın veya veritabanının birbiri ile sorunsuz çalışabilmesini, en sağlıklı bir şekilde birbiri ile iletişime geçmesini, birbiri ile veri alışverişi yapabilmesini sağlayan yapılara verilen isimdir.
+R ortamı için kullanıcılar tarafından geliştirilen çeşitli paketleri kullanarak bazı kurum ve veri sahiplerinin verilerine tarafından yalnızca bir kaç satır kodla kolayca ulaşılabilmektedir.</description>
+    </item>
+    
+  </channel>
+</rss>

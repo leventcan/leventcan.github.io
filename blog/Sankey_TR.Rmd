@@ -1,0 +1,208 @@
+---
+title: "Türkiye'de Bölgeler Arası Göç Akışları"
+description: "Bu blog paylaşımımda Türkiye'deki iller arası göç verilerinden dinamik Sankey akış grafiğinin oluşturulması ilgili süreçlere değineceğim"
+date: '2018-07-15'
+type: "post"
+tags: [
+ "Sankey Chart",
+ "Sankey Diyagramı",
+ "Bölgesel Göç",
+ "Göç",
+ "Plotly",
+ "Migration",
+ "Veri Görselleştirme"
+]
+keywords: [
+"Leaflet",
+ "Sankey Chart",
+ "Sankey Diyagramı",
+ "Bölgesel Göç",
+ "Göç",
+ "Plotly",
+ "Migration",
+ "Veri Görselleştirme"
+]
+thumbnailImagePosition: "left"
+
+slug: "türkiye_goc"
+coverImage: /
+draft: false
+output:
+  md_document:
+    variant: markdown
+---
+
+<style>
+body {
+text-align: justify}
+</style>
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,warning=FALSE, message=FALSE, collapse = TRUE, fig.align='center')
+```
+
+
+```{r, include = FALSE}
+htmltools::tagList(rmarkdown::html_dependency_font_awesome())
+```
+
+
+## Veri Hazırlık Aşaması
+
+TÜİK'in websitesindeki [veritabanları](http://www.tuik.gov.tr/PreTabloArama.do?metod=search&araType=vt) bölümünde iller arasıdaki göç matrisi, istenilen yıl detayında oluşturulup indirilebilmektedir.
+
+
+```{r, echo=FALSE}
+library(readxl)
+
+#Verilerin olduğu excel dosyasının içe aktarılması
+nuts3_goc <- read_excel("C:/--DOSYALARIM/R-Projects/Github_Page/website-hugo/static/Veri/nuts3_goc.xlsx", sheet = "data")
+
+nuts3_goc$YIL <- as.integer(nuts3_goc$YIL)
+
+#İBBS tipolojisi ile eşleştirme yapmak için
+trkod <- read_excel("C:/--DOSYALARIM/R-Projects/Github_Page/website-hugo/static/Veri/trkod.xlsx")
+```
+
+```{r,eval=FALSE}
+library(readxl)
+
+#Verilerin olduğu excel dosyasının içe aktarılması
+nuts3_goc <- read_excel("nuts3_goc.xlsx", sheet = "data")
+
+nuts3_goc$YIL <- as.integer(nuts3_goc$YIL)
+
+#İBBS tipolojisi ile eşleştirme yapmak için
+trkod <- read_excel("trkod.xlsx")
+```
+
+
+´nuts3_goc´ dataframe objesinde yer alan göç matrisinin görünümü aşağıdaki şekildedir.
+
+```{r}
+head(nuts3_goc)
+```
+
+´nuts3_goc´ dataframe objesinde belirli bir yılda her bir ilden diğer ile olan göç sayısı gösterilmektedir. Söz konusu matristeki (R'daki matris mantığında değil) göç veren iller satır olarak, göç alan iller ise kolon olarak gösterilmektedir. Fakat R ile ilgili paketlerin fonksiyonları genellikle <mark>tidy</mark> yani unpivot durumunda olan verileri girdi olarak kabul etmektedir. Bu yüzden ´nuts3_goc´ objesininde `tidyr` paketi ile gerekli dönüşüm işlemlerinin yapılması gerekmektedir.
+
+
+
+
+```{r}
+library(tidyr)
+library(dplyr)
+
+# Verilerde temizlik ve hazırlık işlemleri
+
+nuts3_goc_temiz <- nuts3_goc %>% gather(TO_IL, SAYI, 4:ncol(nuts3_goc)) %>%
+  left_join(trkod, by = c("FROM_IL" = "Duzey_3_Ad")) 
+
+colnames(nuts3_goc_temiz)[6:ncol(nuts3_goc_temiz)] <- paste("FROM_", colnames(nuts3_goc_temiz)[6:ncol(nuts3_goc_temiz)], sep="")
+
+nuts3_goc_temiz <- nuts3_goc_temiz %>% left_join(trkod, by = c("TO_IL" = "Duzey_3_Ad"))
+
+colnames(nuts3_goc_temiz)[13:ncol(nuts3_goc_temiz)] <- paste("TO_", colnames(nuts3_goc_temiz)[13:ncol(nuts3_goc_temiz)], sep="")
+
+# Coğrafi Bölge Ölçeğinde gruplamanın yapılması ve ağ yapısının oluşturulması
+
+goc_data <- nuts3_goc_temiz %>% group_by(YIL, FROM_Cografi, TO_Cografi) %>%
+  summarise(SAYI = sum(SAYI)) %>% 
+  filter(FROM_Cografi != TO_Cografi) %>%
+  ungroup()
+
+```
+
+
+```{r}
+# Verilerin net göç verisine dönüştürülmesi
+
+goc_data$NET_SAYI <- NA
+
+for (i in unique(goc_data$YIL)){
+  
+  for (j in unique(goc_data$FROM_Cografi)){
+    
+    for (m in unique(goc_data$TO_Cografi)){
+      
+      goc_data$NET_SAYI[goc_data$YIL == i & goc_data$FROM_Cografi == j & 
+                          goc_data$TO_Cografi == m] <- goc_data$SAYI[goc_data$YIL == i & goc_data$FROM_Cografi == j & 
+                                                                           goc_data$TO_Cografi == m] -
+        goc_data$SAYI[goc_data$YIL == i & goc_data$FROM_Cografi == m & 
+                            goc_data$TO_Cografi == j]
+      
+    }
+    
+  }
+  
+}
+```
+
+
+```{r}
+# Göç verilerinde yalnızca pozitif değerlere sahip olan bölgeleri almak verilen net göçü görmek için yeterlidir
+
+goc_data <- goc_data %>% filter(NET_SAYI > 0) %>% select(-SAYI) %>%
+  filter(YIL == 2017)
+
+# Her bir coğrafi bölgeye indeks numarasının verilmesi
+
+index_nums <- data.frame(bolge = unique(nuts3_goc_temiz$FROM_Cografi), FROM_index = c(0:6),
+                         TO_index = c(7:13))
+
+# Indeks numaralarının data frame e yerleştirilmesi
+
+goc_data <- goc_data %>% 
+  left_join(select(index_nums, -TO_index), by = c("FROM_Cografi" = "bolge")) %>% 
+  left_join(select(index_nums, -FROM_index), by = c("TO_Cografi" = "bolge")) %>%
+  arrange(FROM_index, TO_index)
+```
+
+```{r}
+library(plotly)
+library(paletteer)
+
+# Sankey diyagramının oluşturulması
+
+plot_ly(
+  type = "sankey",
+
+  orientation = "h",
+  valuesuffix = " Kişi",
+  valueformat = ".0f", #,.2r #.0f
+  
+  node = list(
+    label = c(as.character(index_nums$bolge),as.character(index_nums$bolge)),
+    color = c(paletteer_d(ggsci, default_igv, 7), paletteer_d(ggsci, default_igv, 7)),
+    pad = 15,
+    thickness = 20,
+    line = list(
+      color = "black",
+      width = 0.5
+    )
+  ),
+  
+  link = list(
+    source = as.vector(goc_data$FROM_index),
+    target = as.vector(goc_data$TO_index),
+    value =  as.vector(goc_data$NET_SAYI),
+    value =  as.vector(goc_data$NET_SAYI)
+  )
+) %>% 
+  layout(
+    title = "Türkiye'de Coğrafi Bölgeler Arası Göç Akımları",
+    font = list(
+      size = 10
+    )
+    
+  )
+```
+
+Yukarıdaki grafikte yalnızca 2017 yılındaki coğrafi bölgeler arasındaki net göç akımları görülmektedir. Aşağıda yer alan Shiny uygulmasından diğer yıllara ilişkim gösterimde otomatik olarak hesaplanıp oluşturulmaktadır.
+
+
+
+### İnteraktif Uygulama
+
+<iframe width="700" height="600" scrolling="no" frameborder="no"  src="https://leventcan.shinyapps.io/TR_Goc_Shiny2/"> </iframe>
+

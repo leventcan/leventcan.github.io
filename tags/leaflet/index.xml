@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Leaflet on Leventcan Gültekin</title>
+    <link>/tags/leaflet/</link>
+    <description>Recent content in Leaflet on Leventcan Gültekin</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>tr</language>
+    <lastBuildDate>Sun, 05 Nov 2017 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="/tags/leaflet/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Leaflet ile İnteraktif Haritalar</title>
+      <link>/blog/leaflet/</link>
+      <pubDate>Sun, 05 Nov 2017 00:00:00 +0000</pubDate>
+      
+      <guid>/blog/leaflet/</guid>
+      <description>body {text-align: justify}Leaflet-RLeaflet özellikle web tabanlı interaktif haritalama işlemlerinde en sık kullanılan JavaScript kütüphanelerinden birisidir. Rstudio tarafından geliştirilen aynı isimdeki Leaflet paketi ile R üzerinden de Leaflet haritaları oluşturulabilmektedir.
+#Gerekli kütüphanelerin aktif hale getirilmesilibrary(leaflet)library(dplyr)En basit haliyle interaktif bir haritayı aşağıdaki şekilde oluşturabiliriz.
+#Leafletm &amp;lt;- leaflet(width = 720) %&amp;gt;%addTiles() %&amp;gt;% addMarkers(lng=32.</description>
+    </item>
+    
+  </channel>
+</rss>

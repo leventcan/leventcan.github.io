@@ -1,0 +1,216 @@
+---
+title: "Dünya Bankası ve OECD API'si İle Veri Analizi"
+description: "Dünya Bankası ve OECD API'lerine R üzerinden erişim sağlanarak uluslararası ölçekte, bir çok gösterge detayında veriye kolayca erişilebilmekte ve analiz gerçekleştirilebilmektedir"
+date: '2017-11-03'
+type: "post"
+tags: [
+ "Dünya Bankası",
+ "OECD",
+ "Veri Görselleştirme",
+ "ggplot2"
+]
+keywords: [
+"ggplot2",
+"API"
+]
+showonlyimage: false
+#thumbnailImagePosition: "top"
+#thumbnailImage: "//res.cloudinary.com/dyv5c62ez/image/upload/v1514068554/WB_OECD_rndnnn.jpg"
+
+slug: "world-bank"
+coverImage: /
+draft: false
+output:
+  md_document:
+    variant: markdown_github
+---
+
+<style>
+body {
+text-align: justify}
+</style>
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,warning=FALSE, message=FALSE, collapse =TRUE, fig.align='center')
+```
+
+
+```{r, include = FALSE}
+htmltools::tagList(rmarkdown::html_dependency_font_awesome())
+```
+
+## Dünya Bankası ve OECD API'leri
+
+API sistemi (Application Programing Interfaces - Uygulama Programlama Arayüzleri) en kısa hali ile iki yazılımın veya veritabanının birbiri ile sorunsuz çalışabilmesini, en sağlıklı bir şekilde birbiri ile iletişime geçmesini, birbiri ile veri alışverişi yapabilmesini  sağlayan yapılara verilen isimdir.
+
+R ortamı için kullanıcılar tarafından geliştirilen çeşitli paketleri kullanarak bazı kurum ve veri sahiplerinin verilerine tarafından yalnızca bir kaç satır kodla kolayca ulaşılabilmektedir. Geliştirilen bu paketlerin en önemli işlevlerinden birisi ise xml veya json gibi nested formatta olan verileri düzenleyerek size düzenli bir şekilde tablosal olarak ulaştırmasıdır.
+
+Bu blog paylaşımımda ekonomistler için çok kritik konumda olan Dünya Bankası ve OECD kuruluşlarının sunduğu API hizmetleri için geliştirilen R paketlerinin kullanımını inceleyeceğim.
+
+Konuya detaylı olarak ilgi duyan kişilere [DataCamp](https://www.datacamp.com/courses/working-with-web-data-in-r) tarafından sunulan bu  kursu şiddetle tavsiye ederim.
+
+## "Data360r" Paketi ve Kullanımı
+
+
+Dünya Bankası'nın geliştirmiş API ile bir çok ülke detayında farklı sektör ve temadaki veriye kolaylık ulaşılabilmektedir. [Data360r](https://github.com/mrpsonglao/data360r) paketi ile bu işlem gerçekleştirilmektedir. Yapacağım bu çalışmada da veri manipülasyon işlemlerinde `dplyr` ve `tidyr` paketlerini, görselleme işlemlerinde ise `ggplot2` paketini kullanacağım.
+
+```{r }
+#Gerekli kütüphanelerin aktif hale getirilmesi
+library(data360r)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(ggthemes)
+library(plotly)
+library(forcats)
+```
+
+
+Dünya Bankası, bu paket ile `tc` ve `gov` olmak üzere iki ayrı veritabanına erişime olanak sağlamaktadır. Bunların içerikleri ve göstergeler de birbirlerinden farklıdır. Çok fazla veri olduğu için öncelikle metaveri bilgisini data frame'e kaydediyoruz. Bu data frame nesnelerinin içeriğine kendi IDE'nizden bakarak hangi göstergeyi kullanmak istediğiniza karar verebilirsiniz.
+
+```{r}
+#Metaverinin oluşturulması
+df_indicators_tc <- get_metadata360(site="tc", metadata_type = "indicators")
+df_indicators_tc <- df_indicators_tc %>% arrange(id)
+
+df_indicators_gov <- get_metadata360(site="gov", metadata_type = "indicators")
+df_indicators_gov <- df_indicators_gov %>% arrange(id)
+```
+
+Veri setlerinde hangi ülkelin olduğu ve bu ülkelere ilişkin referans kodları öğrenmek için de aşağıdaki komutu yazabiliriz.
+
+```{r}
+#Ülke kodlarının alınması
+df_countries <- get_metadata360(metadata_type = 'countries')
+```
+
+Aşağıdaki örnekte Türkiye için toplam milli tasarufların GSYH'ye oranını alalım
+
+```{r}
+#Türkiye için verinin çekilmesi
+tur_data <- get_data360(site = "tc", country_iso3 = c("TUR"),
+                        indicator_id = c(983),
+                        output_type = "long")
+```
+
+
+```{r}
+#Zaman serisi grafiğinin oluşturulması
+
+
+ggplotly(
+  ggplot(data = tur_data,aes(x=Period, y=Observation, group=1)) +
+  geom_line(size=1)+geom_point() +
+  scale_x_discrete(breaks = seq(1960,2016,2)) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+    labs(x="", y= "Tasarruf/GSYH")
+  )
+
+
+```
+
+Aşağıdaki örnekte ise bazı ülkerininde verilerini alıyoruz ve bunlarıda grafiğimize ekliyoruz.
+
+```{r}
+#Dört ükeye ilişkin verinin çekilmesi
+countries_data <- get_data360(site = "tc", country_iso3 = c("TUR","CHN","USA","RUS"),
+                        indicator_id = c(983),
+                        output_type = "long")
+```
+
+
+```{r}
+#Dört ülkeli zaman serisi grafiğinin oluşturulması
+ggplotly(
+ ggplot(data = countries_data,aes(x=Period, y=Observation, group=`Country ISO3`,colour=`Country ISO3`)) + 
+  geom_point(size=1)+ geom_line()+ scale_x_discrete(breaks = seq(1960,2016,2)) + 
+  theme(axis.text.x = element_text(angle = 90, hjust = 1),
+        plot.margin = unit(c(0,2,1,1), "cm")) +
+   labs(x="", y= "Tasarruf/GSYH")
+
+)
+```
+
+Bu verileri tek bir koordinat düzleminde göstermek yerine ülkeye göre dağıtarak da gösterebiliriz. Veriler incelendiğinde Türkiye'de ve özellikle Çin'de tasarruf oranlarındaki artış göze çarpmaktadır.
+
+```{r}
+#Dört ülkeli zaman serisi grafiğinin oluşturulması
+ggplotly(
+  ggplot(data = countries_data,aes(x=Period, y=Observation, group=1)) +
+    geom_line() + scale_x_discrete(breaks = seq(1960,2016,10)) +
+    theme(axis.text.x = element_text(angle = 90, hjust = 1),
+          plot.margin = unit(c(0,0,1,1), "cm")) +
+    labs(x="", y= "Tasarruf/GSYH") + facet_grid(. ~ `Country ISO3`)
+)
+
+
+```
+
+##"OECD" Paketi ve Kullanımı
+
+OECD verilerine ise [OECD](https://cran.r-project.org/web/packages/OECD/index.html) paketi ile  erişilebilebilmektedir. 
+
+```{r}
+library(OECD)
+```
+
+Hangi veriyi aradığımız hakkında herhangi bir fikrimiz yoksa, ilk olarak bütün alt veritabanı bilgilerini bir dataframe'e kaydedip, onun üstünden belirli metin filtreleri ile arama yapabiliriz. Aşağıdaki kodda tüm alt veritabanları listesi kaydediliyor ve ardından "verimlilik" ifadesinin geçtiği alt veritabanlarının arıyoruz.
+
+```{r}
+dataset_list <- get_datasets()
+search_dataset("Productivity", data = dataset_list)
+```
+
+Eldeki verileri incelediğimde ekonomideki iş gücü verimliliğini ifade eden `LEVEL` id' sine sahip alt veritabanını kullanmaya karar veriyorum.
+
+```{r}
+dataset <- "LEVEL"
+```
+
+Veritabanını indirmeden önce verinin yapısına bakmakta fayda bulunmaktadır. `str` fonksiyonu ile verinin yapısını incelediğimiz "list" yapısı halinde metaveri bilgilerini görebiliyoruz. Veriyi indirmeden önce bu veri filtreleri ile indirilecek dosya büyüklüğü kısıtlanabilir. Alternatif olarak tüm veri setini indirip, ardından base R fonksiyonları ile filtreleme de yapılabilir fakat bu yöntem dosyası indirme süresini uzatacaktır. 
+
+
+```{r}
+dstruc <- get_data_structure(dataset)
+str(dstruc, max.level = 1)
+```
+
+Tek bir değişkenle çalışacağım için dosya büyüklüğü sorununu ihmal ediyorum ve tüm veri setini filtre kullanmadan indiriyorum. Devamında `dplyr` paketi yardımıyla gerekli filtrelemeleri yapacağım.
+
+```{r}
+
+df_productivity <- get_dataset(dataset = dataset)
+
+head(df_productivity)
+
+```
+
+Veriyi indirildiğinde `VAR` değişkeni dikkate çarpmaktadır. Buradaki `VAR` değişkeni veritabanındaki farklı değişkenleri ifade etmektedir. Bunların ne olduğu aşağıdaki sorgu ile anlyabiliriz. 
+
+```{r}
+dstruc$VAR
+```
+
+Sonuçları incelediğimde Çalışılan Saat Başına GSYH Tutarını (Dolar) ifade eden `PDYC` değişkenini kullanmaya karar veriyorum ve verisetimi buna göre filtreliyorum
+
+
+```{r}
+df_productivity <- df_productivity %>% filter(VAR == "PDYC")
+df_productivity$COU <- as.factor(df_productivity$COU)
+```
+
+Filtreleme işlemini tamamladıktan sonra değişkene ilişkin  yalnızca 2012 yılı verilerinin olduğunu görüyorum. Artık veri görselleştirmeye hazır durumdadır.
+
+```{r}
+
+ggplotly(
+  ggplot(df_productivity) + geom_bar(aes(x= fct_reorder(COU, obsValue,.desc = TRUE), y= obsValue), 
+                                     alpha=0.7, fill="green4", stat = "identity") +
+    theme(axis.text.x = element_text(angle = 90, hjust = 1),
+          plot.margin = unit(c(0,0,1,1), "cm")) + 
+    labs(x="", y= "GSYH / Çalışılan Saat")
+     )
+  
+
+```
+

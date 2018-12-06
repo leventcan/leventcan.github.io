@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Göç on Leventcan Gültekin</title>
+    <link>/tags/g%C3%B6%C3%A7/</link>
+    <description>Recent content in Göç on Leventcan Gültekin</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>tr</language>
+    <lastBuildDate>Sun, 15 Jul 2018 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="/tags/g%C3%B6%C3%A7/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Türkiye&#39;de Bölgeler Arası Göç Akışları</title>
+      <link>/blog/t%C3%BCrkiye_goc/</link>
+      <pubDate>Sun, 15 Jul 2018 00:00:00 +0000</pubDate>
+      
+      <guid>/blog/t%C3%BCrkiye_goc/</guid>
+      <description>body {text-align: justify}Veri Hazırlık AşamasıTÜİK’in websitesindeki veritabanları bölümünde iller arasıdaki göç matrisi, istenilen yıl detayında oluşturulup indirilebilmektedir.
+library(readxl)#Verilerin olduğu excel dosyasının içe aktarılmasınuts3_goc &amp;lt;- read_excel(&amp;quot;nuts3_goc.xlsx&amp;quot;, sheet = &amp;quot;data&amp;quot;)nuts3_goc$YIL &amp;lt;- as.integer(nuts3_goc$YIL)#İBBS tipolojisi ile eşleştirme yapmak içintrkod &amp;lt;- read_excel(&amp;quot;trkod.xlsx&amp;quot;)´nuts3_goc´ dataframe objesinde yer alan göç matrisinin görünümü aşağıdaki şekildedir.
+head(nuts3_goc)## # A tibble: 6 x 83## YIL FROM_IL Adana Adıyaman Afyonkarahisar Ağrı Aksaray Amasya Ankara## &amp;lt;int&amp;gt; &amp;lt;chr&amp;gt; &amp;lt;dbl&amp;gt; &amp;lt;dbl&amp;gt; &amp;lt;dbl&amp;gt; &amp;lt;dbl&amp;gt; &amp;lt;dbl&amp;gt; &amp;lt;dbl&amp;gt; &amp;lt;dbl&amp;gt;## 1 2015 Adana 0 816 342 263 389 159 3764## 2 2015 Adıyam~ 905 0 92 136 68 40 986## 3 2015 Afyonk~ 235 67 0 118 65 62 1921## 4 2015 Ağrı 247 129 189 0 95 89 2749## 5 2015 Aksaray 459 54 140 39 0 50 1956## 6 2015 Amasya 129 40 48 101 29 0 1982## # .</description>
+    </item>
+    
+  </channel>
+</rss>

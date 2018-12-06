@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Ggplot2 on Leventcan Gültekin</title>
+    <link>/tags/ggplot2/</link>
+    <description>Recent content in Ggplot2 on Leventcan Gültekin</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>tr</language>
+    <lastBuildDate>Fri, 03 Nov 2017 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="/tags/ggplot2/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Dünya Bankası ve OECD API&#39;si İle Veri Analizi</title>
+      <link>/blog/world-bank/</link>
+      <pubDate>Fri, 03 Nov 2017 00:00:00 +0000</pubDate>
+      
+      <guid>/blog/world-bank/</guid>
+      <description>body {text-align: justify}Dünya Bankası ve OECD API’leriAPI sistemi (Application Programing Interfaces - Uygulama Programlama Arayüzleri) en kısa hali ile iki yazılımın veya veritabanının birbiri ile sorunsuz çalışabilmesini, en sağlıklı bir şekilde birbiri ile iletişime geçmesini, birbiri ile veri alışverişi yapabilmesini sağlayan yapılara verilen isimdir.
+R ortamı için kullanıcılar tarafından geliştirilen çeşitli paketleri kullanarak bazı kurum ve veri sahiplerinin verilerine tarafından yalnızca bir kaç satır kodla kolayca ulaşılabilmektedir.</description>
+    </item>
+    
+  </channel>
+</rss>

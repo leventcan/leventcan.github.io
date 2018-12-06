@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Twitter on Leventcan Gültekin</title>
+    <link>/tags/twitter/</link>
+    <description>Recent content in Twitter on Leventcan Gültekin</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>tr</language>
+    <lastBuildDate>Sat, 31 Mar 2018 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="/tags/twitter/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Twitter ile İçerik Analizi</title>
+      <link>/blog/twitter-ile-i%C3%A7erik-analizi/</link>
+      <pubDate>Sat, 31 Mar 2018 00:00:00 +0000</pubDate>
+      
+      <guid>/blog/twitter-ile-i%C3%A7erik-analizi/</guid>
+      <description>body {text-align: justify}İçerik Analizi“Twitter ile Sosyal Ağ Analizi” içerikli ilk blog paylaşımımda R programlama dili kullanarak Twitter API’sinden nasıl veri çekilebileceği ve bu veriler ile sosyal ağların nasıl görselleştirilebileceği üzerinde durmuştuk.
+Twitter’dan elde edilen verilerin sosyal ağları göstermesinin yanında diğer bir özelliğide atılan tweetlerin mutlak olarak belirli bir içeriği yansıtmasıdır.
+Bu sebeple bu paylaşımımda Twitter’dan elde edilen veriler üzerinden basit bir içerik analizi yapmayı deneyeceğim.</description>
+    </item>
+    
+    <item>
+      <title>Twitter ile Sosyal Ağ Analizi</title>
+      <link>/blog/twitter-ile-sosyal-a%C4%9F-analizi/</link>
+      <pubDate>Sun, 18 Mar 2018 00:00:00 +0000</pubDate>
+      
+      <guid>/blog/twitter-ile-sosyal-a%C4%9F-analizi/</guid>
+      <description>body {text-align: justify}Twitter APIGünümüzde giderek kompleksleşen sosyal ilişkiler bu ilişkilerin ağ felsefesinde incelenmesi ihtiyacını ortaya çıkarmaktadır. Sosyal ağlara yapısına ilişkin veriler geçmişte anketler ve diğer ikincil kaynaklardan bulunmakta ve erişimi çok zor ve zahmetli iken, günümüzde Twitter, Facebook, Youtube gibi devasa sosyal medya platformlarının ön plana çıkmasıyla bu platformlardan üretilen ve ağ yapısını gösteren verilere kolayca erişilebilmektedir.
+Bu ortamlarda üretilen veriler geliştirici ve kullanıcılara API (Application Program Interface) olarak adlandırılan kanallar üzerinden verilmektedir.</description>
+    </item>
+    
+  </channel>
+</rss>

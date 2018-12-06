@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="chrome=1">
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="referrer" content="no-referrer">
+<meta name="author" content="Leventcan Gültekin">
+<meta name="description" content="Twitter API&#39;den çekilecek verilerle metinsel içerik analizi">
+
+<meta property="og:title" content="Twitter ile İçerik Analizi" />
+<meta property="og:description" content="Twitter API&#39;den çekilecek verilerle metinsel içerik analizi" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="/blog/twitter-ile-i%C3%A7erik-analizi/" />
+
+
+
+<meta property="article:published_time" content="2018-03-31T00:00:00&#43;00:00"/>
+
+<meta property="article:modified_time" content="2018-03-31T00:00:00&#43;00:00"/>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<title>
+
+
+     Twitter ile İçerik Analizi 
+
+</title>
+<link rel="canonical" href="/blog/twitter-ile-i%C3%A7erik-analizi/">
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:400,700|Ubuntu+Mono:400,400i,700,700i|Raleway:500">
+
+
+
+    
+    <link rel="stylesheet" href="/css/reset.css?t=2018-12-06%2017%3a39%3a54.6577402%20%2b0300%20%2b03%20m%3d%2b0.503455501">
+    <link rel="stylesheet" href="/css/pygments.css?t=2018-12-06%2017%3a39%3a54.6577402%20%2b0300%20%2b03%20m%3d%2b0.503455501">
+    <link rel="stylesheet" href="/css/main.css?t=2018-12-06%2017%3a39%3a54.6577402%20%2b0300%20%2b03%20m%3d%2b0.503455501">
+    
+        <link rel="stylesheet" href="/css/override.css?t=2018-12-06%2017%3a39%3a54.6577402%20%2b0300%20%2b03%20m%3d%2b0.503455501">
+    
+
+
+
+
+<link rel="shortcut icon"
+
+    href="/img/leaf.ico"
+
+>
+
+
+
+
+
+
+
+
+</head>
+
+
+<body lang="tr">
+
+<link rel="stylesheet" href="/css/github.css" rel="stylesheet" id="theme-stylesheet">
+<script src="/js/highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+<section class="header">
+    <div class="container">
+        <div class="content">
+            
+                
+                
+                
+                
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                
+                <a href="/"><img class="avatar" src="/img/lg_pic.jpg" srcset="/img/lg_pic.jpg 1x"></a>
+            
+            <a href="/"><div class="name">Leventcan Gültekin</div></a>
+            
+            <nav>
+                <ul>
+                    
+                        <li class="nav-blog"><a href="/blog/"><span>Blog</span></a></li>
+                    
+                        <li class="nav-about"><a href="/about/"><span>Hakkımda</span></a></li>
+                    
+                </ul>
+            </nav>
+        </div>
+    </div>
+</section>
+
+<section class="icons">
+    <div class="container">
+        <div class="content">
+        
+            <a href="https://github.com/leventcan" target="_blank" rel="noopener"><img class="icon" src="/img/github.svg" alt="github" /></a>
+        
+
+        
+
+        
+
+	
+
+        
+
+        
+
+        
+            <a href="https://www.linkedin.com/in/leventcan-gultekin/" target="_blank" rel="noopener"><img class="icon" src="/img/linkedin.svg" alt="linkedin" /></a>
+        
+
+        
+
+        
+
+        
+
+        
+
+        
+
+        
+
+        
+
+        
+        </div>
+    </div>
+</section>
+
+<section class="main">
+    <div class="container">
+        <div class="content">
+            <div class="page-heading">
+
+    Twitter ile İçerik Analizi
+
+</div>
+
+            <div class="markdown">
+                <style>
+body {
+text-align: justify}
+</style>
+<div id="icerik-analizi" class="section level2">
+<h2>İçerik Analizi</h2>
+<p>“Twitter ile Sosyal Ağ Analizi” içerikli ilk blog paylaşımımda R programlama dili kullanarak Twitter API’sinden nasıl veri çekilebileceği ve bu veriler ile sosyal ağların nasıl görselleştirilebileceği üzerinde durmuştuk.</p>
+<p>Twitter’dan elde edilen verilerin sosyal ağları göstermesinin yanında diğer bir özelliğide atılan tweetlerin mutlak olarak belirli bir içeriği yansıtmasıdır.</p>
+<p>Bu sebeple bu paylaşımımda Twitter’dan elde edilen veriler üzerinden basit bir içerik analizi yapmayı deneyeceğim.</p>
+<p>R ekosistemi içerisinde metinsel içerik analizi ve doğal dil işleme (NLP) ile ilgili çeşitli paket bulunmaktadır. Burada en sık kullanılan iki kütüphane bulunmaktadır. - Bunlardan birincisi <code>tm</code> paketidir. <code>tm</code> paketi metin verilerinin çekilmesi, işlenmesi, metaveri yönetimi, terim-döküman matrisinin oluşturulması gibi içerik analizinde en sık kullanılan fonksiyonlara sahip bir pakettir. - İkincisi ise yakın zamanda Julia Silge ve David Robinson (2016) tarafından geliştirilen <code>tidytext</code> paketidir. <code>tidytext</code> paketinin tasarımı tamamen <mark>“Tidy Data”</mark> felsefesine uygun olup, kodlama akışı içerisinde oluşturdumuz objeler rahatlıkla <code>dplyr</code>, <code>stringr</code> ve <code>ggplot2</code> gibi tidyverse ekosistemi içerisindeki paketlerle uyum içerisinde kullanılabilmektedir. <code>tidytext</code> paketinin kullanımı hakkında detaylı bilgiye sahip olmak isteyenlere <a href="https://www.tidytextmining.com/">Text Mining with R</a> online kitabını incelemesini şiddetle tavsiye ederim.</p>
+<p>Yapacağım çalışma içerisinde genellikle <code>tidytext</code> paketini kullanmayı tercih ediyorum, fakat bazı spesifik işlemlerde <code>tm</code> paketindeki fonksiyonlara başvurmak durumunda kalacağım.</p>
+<p>Bu çalışmada “besiktas” hashtagi ile atılmış son 1000 adet tweeti incelemek istiyorum. Bir önceki blog paylaşımımda Twitter üzerinden veri çekme işleminin nasıl gerçekleştirileceği ile ilgili gerekli işlemleri göstermiştim. Aynı adımları <mark>#besiktas</mark> hashtagi üzerinden tekrarlayacağım.</p>
+<pre class="r"><code>library(twitteR)
+library(ROAuth)
+library(openssl)
+library(httpuv)
+
+options(httr_oauth_cache=T)
+
+consumer_key &lt;- &quot;xxxxxxxxxxxxxxxxxxxxxx&quot;
+consumer_secret &lt;- &quot;xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx&quot;
+access_token &lt;- &quot;xxxxxxxxx-xxxxxxxxxxxxxxxxxxxxxxx&quot;
+access_secret &lt;- &quot;xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx&quot;
+
+setup_twitter_oauth(consumer_key, consumer_secret, access_token, access_secret)</code></pre>
+<pre class="r"><code>tweets &lt;- searchTwitteR(&quot;#besiktas&quot;, n=1000,  locale = &quot;tr_TR&quot;)
+
+tweets.df &lt;- twListToDF(tweets)</code></pre>
+<pre class="r"><code>tweet_clean &lt;- tweets.df
+
+library(stringi)
+library(stringr)
+library(tm)
+
+tweet_clean$text &lt;- stri_enc_toutf8(tweet_clean$text)</code></pre>
+<p>Atılan tweetlerin içeriklerine hızlı bir şekilde göz atıldığında tweetlerin kişilerin kendisinin attığı tweet, bazılarının ise Retweet (RT) olduğu görülecektir. Retweet’leri ayırmak amacıyla Twitter’dan gelen verilerin başında “RT” ifadesinin olduğu görülecektir. Eğer tweetler RT ise bu “RT” ifadesini kaldırmak amacıyla aşağıdaki kodu kullanıyorum.</p>
+<pre class="r"><code>#RT ifadelerinin kaldırılması
+tweet_clean$text &lt;- ifelse(str_sub(tweet_clean$text,1,2) == &quot;RT&quot;,
+                           substring(tweet_clean$text,3),
+                           tweet_clean$text)</code></pre>
+<p>Tweetlerin içerisinde hala; rakamlar, URL linkler, “@” ve “#” sembolleri, emojiler ve yabancı içerikleri gösteren unicode ifadeler gibi temizlenmesi gereken bir çok içerik bulunmaktadır. Bu tür bir metin temizliği işlemleri ile ilgili olarak aşağıda toplu olarak belirtilen kodları oluşturdum. Yapmış olduğum her işlemin içeriği, kodların üzerinde yer alan başlıkdan izlenebilmektedir. String tespit işlemlerinde yine <code>stringr</code> ve Base R fonksiyonlarını kullanacağım.</p>
+<p>Bir önceki blog paylaşımımda çok kısa olarak kullandığım Kurallı İfadeler (Regular Expressions-Regex) bu bölümde çok daha sık kullanılmaktadır. Regex’ler hakkında detaylı bilgiye sahip olmak isteyenler <a href="http://www.gastonsanchez.com/r4strings/">bu kitabı</a> inceleyebilirler.</p>
+<pre class="r"><code>#URL linklerinin temizlenmesi
+tweet_clean$text &lt;- str_replace_all(tweet_clean$text, &quot;http[^[:space:]]*&quot;, &quot;&quot;)
+
+
+#Hashtag &quot;#&quot; ve &quot;@&quot; işaretlerinin kaldırılması
+tweet_clean$text &lt;- str_replace_all(tweet_clean$text, &quot;#\\S+&quot;, &quot;&quot;)
+tweet_clean$text &lt;- str_replace_all(tweet_clean$text, &quot;@\\S+&quot;, &quot;&quot;)
+
+#Noktalama işaretlerinin temizlenmesi
+tweet_clean$text &lt;- str_replace_all(tweet_clean$text, &quot;[[:punct:][:blank:]]+&quot;, &quot; &quot;)
+
+#Tümh harflerin küçük harfe dönüştürülmesi
+tweet_clean$text  &lt;- str_to_lower(tweet_clean$text, &quot;tr&quot;)
+
+#Rakamların temizlenmesi
+tweet_clean$text &lt;- removeNumbers(tweet_clean$text)
+
+#ASCII formatına uymayan karakterlerin temizlenmesi
+tweet_clean$text &lt;- str_replace_all(tweet_clean$text, &quot;[&lt;].*[&gt;]&quot;, &quot;&quot;)
+tweet_clean$text &lt;- gsub(&quot;\uFFFD&quot;, &quot;&quot;, tweet_clean$text, fixed =  TRUE)
+tweet_clean$text &lt;- gsub(&quot;\n&quot;, &quot;&quot;, tweet_clean$text, fixed =  TRUE)
+
+#Alfabetik olmayan karakterlerin temizlenmesi
+tweet_clean$text &lt;- str_replace_all(tweet_clean$text, &quot;[^[:alnum:]]&quot;,&quot; &quot; )</code></pre>
+<div id="etkisiz-kelimeler-stop-words" class="section level3">
+<h3>Etkisiz Kelimeler (Stop Words)</h3>
+<p>Etkisiz kelimeler (Stop Words) herhangi bir dilde sıkça kullanılan, içerikten bağımsız kelimeler, bağlaçlar, imleçler, sayılar, kalıplaşmış kısaltmalar vb. ifadelerdir (Türkçe’de “bir”, “bu”, “şu” gibi). Bu kelimeler içeriğe genellikle bir anlam katmadığı için metin madenciliği çalışmlarında, hatta arama motorlarında göz ardı edilmektedir.</p>
+<p>İncelenecek dile uygun olarak kullanılan etkisiz kelime arşivinden kelimelerin, incelediğimiz metin dökümanındaki kelimelerle eşleştirilmesi, eğer eşleşme varsa elimizdeki metin dökümanından bu kelimelerin dışlanması gerekmektedir</p>
+<p><code>tidytext</code> paketinin içerisinde otomatik olarak İnglizce etkisiz kelimeler arşivi gelmektedir. Fakat Türkçe için manuel olarak arşivin bulunması gerekmektedir. İnternette yaptığım arama sonucu; GitHub’da bir kullanıcının oluşturmuş olduğu 10.000 kelimelik Türkçe Etkisiz Kelimeler <a href="https://github.com/ahmetax/trstop">arşivini</a> buldum. Arşivdekli kelimeleri daha sonra ayrı bir excel dosyasına kaydettim.</p>
+<pre class="r"><code>#RDS Dosyasını lokalden okuyoruz
+library(readxl)
+Turkish_Stopwords &lt;- read_excel(&quot;Turkish-Stopwords.xlsx&quot;)</code></pre>
+<pre class="r"><code>head(Turkish_Stopwords)</code></pre>
+<pre><code>## # A tibble: 6 x 2
+##   ID       STOPWORD
+##   &lt;chr&gt;    &lt;chr&gt;   
+## 1 11430660 bir     
+## 2 09850529 ve      
+## 3 05500664 bu      
+## 4 03781404 da      
+## 5 03685203 de      
+## 6 02754682 için</code></pre>
+</div>
+<div id="tidytext-ile-icerik-analizi" class="section level3">
+<h3>Tidytext ile içerik analizi</h3>
+<p>Daha öncede belirttiğim gibi, <code>tidytext</code> paketi tidyverse ekosisteminin tamamıyla uyumlu bir şekile çalışmakta, metinsel içerikleri tidy data formatında değerlendirmektedir. İçerisinde yer alan <code>unnest_tokens()</code> fonksiyonu ile string ifadeleri içerisindeki her bir kelime ayrı olarak satırlara dağıtılabilmektedir. Veri formatı bu şekle geldikten sonra <code>dplyr</code> ve <code>ggplot2</code> paketleri ile sorunsuz olarak çalışılabilecektir.</p>
+<pre class="r"><code>library(tidytext)
+library(dplyr)
+library(ggplot2)
+
+tidy_tweets &lt;- tweet_clean %&gt;% select(text) %&gt;% 
+  mutate(linenumber = row_number()) %&gt;% unnest_tokens(word, text)
+
+tidy_tweets &lt;- tidy_tweets %&gt;% anti_join(Turkish_Stopwords, by=c(&quot;word&quot;=&quot;STOPWORD&quot;))
+
+head(tidy_tweets)</code></pre>
+<pre><code>##   linenumber       word
+## 1          1      babel
+## 2          1    seveyim
+## 3          1    kiminle
+## 4          1   sevinsen
+## 5          2       lens
+## 6          2 çıldırıcam</code></pre>
+<p>Tweetlerde kullanılan bütün kelimeler <code>tidy_tweets</code> Data Frame objesinde birer satır olarak belirtildiği için en çok hangi kelimelerin kullanıldığına aşağıdaki şekilde bakabiliriz.</p>
+<pre class="r"><code>tidy_tweets %&gt;%
+  count(word, sort = TRUE) %&gt;%
+  filter(n &gt; 20) %&gt;%
+  mutate(word = reorder(word, n)) %&gt;%
+  ggplot(aes(word, n)) +
+  geom_col() +
+  xlab(NULL) +
+  coord_flip() + theme_minimal() +
+  ggtitle(&quot;Tweetlerde en çok kullanılan kelimeler&quot;)</code></pre>
+<p><img src="/blog/twitter_sna2_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
+<p>Yukarıda gösterilen görsele benzer olarak <code>wordcloud</code> paketi ile kelimelerin kullanım sıkılığına bağlı olarak ön plana çıkan kelimeleri, kelime bulutları şeklinde görselleştirebiliriz. Kelime bulutunu oluşturmak için gerekli kod aşağıda gösterilmektedir.</p>
+<pre class="r"><code>library(wordcloud)
+
+tidy_tweets %&gt;% 
+  count(word) %&gt;%
+  with(wordcloud(word, n, max.words = 100))</code></pre>
+<p><img src="/blog/twitter_sna2_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
+</div>
+</div>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<script>
+window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+ga('create', 'UA-123-45', 'auto');
+ga('send', 'pageview');
+</script>
+<script async src='//www.google-analytics.com/analytics.js'></script>
+
+
+
+
+
+
+
+</body>
+</html>
+

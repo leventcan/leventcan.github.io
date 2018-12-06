@@ -1,0 +1,215 @@
+---
+title: "Twitter ile İçerik Analizi"
+description: "Twitter API'den çekilecek verilerle metinsel içerik analizi"
+date: '2018-03-31'
+type: "post"
+tags: [
+ "Twitter",
+ "Veri Görselleştirme",
+ "İçerik Analizi",
+  "Sosyal ağ analizi",
+ "R programlama dili",
+ "Twitter Veri Çekme",
+ "Twitter API",
+ "Network Analizi",
+ "tidytext"
+]
+keywords: [
+"Twitter"
+]
+slug: "Twitter-ile-içerik analizi"
+coverImage: /
+draft: false
+output:
+  md_document:
+    variant: markdown
+---
+
+<style>
+body {
+text-align: justify}
+</style>
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set( warning = FALSE, message = FALSE, echo = TRUE)
+extrafont::loadfonts(device="win")
+options(httr_oauth_cache=T)
+```
+
+## İçerik Analizi
+
+
+"Twitter ile Sosyal Ağ Analizi" içerikli ilk blog paylaşımımda R programlama dili kullanarak  Twitter API'sinden nasıl veri çekilebileceği ve bu veriler ile sosyal ağların nasıl görselleştirilebileceği üzerinde durmuştuk.
+
+Twitter'dan elde edilen verilerin sosyal ağları göstermesinin yanında diğer bir özelliğide atılan tweetlerin mutlak olarak belirli bir içeriği yansıtmasıdır.
+
+Bu sebeple bu paylaşımımda Twitter'dan elde edilen veriler üzerinden basit bir içerik analizi yapmayı deneyeceğim.
+
+R ekosistemi içerisinde metinsel içerik analizi ve doğal dil işleme (NLP) ile ilgili çeşitli paket bulunmaktadır. Burada en sık kullanılan iki kütüphane bulunmaktadır. 
+- Bunlardan birincisi `tm` paketidir. `tm` paketi metin verilerinin çekilmesi, işlenmesi, metaveri yönetimi, terim-döküman matrisinin oluşturulması gibi içerik analizinde en sık kullanılan fonksiyonlara sahip bir pakettir. 
+- İkincisi ise yakın zamanda Julia Silge ve David Robinson (2016) tarafından geliştirilen `tidytext` paketidir. `tidytext` paketinin tasarımı tamamen <mark>"Tidy Data"</mark> felsefesine uygun olup, kodlama akışı içerisinde oluşturdumuz objeler rahatlıkla `dplyr`, `stringr` ve `ggplot2` gibi tidyverse ekosistemi içerisindeki paketlerle uyum içerisinde kullanılabilmektedir. `tidytext` paketinin kullanımı hakkında detaylı bilgiye sahip olmak isteyenlere [Text Mining with R](https://www.tidytextmining.com/) online kitabını incelemesini şiddetle tavsiye ederim.
+
+Yapacağım çalışma içerisinde genellikle `tidytext` paketini kullanmayı tercih ediyorum, fakat bazı spesifik işlemlerde `tm` paketindeki fonksiyonlara başvurmak durumunda kalacağım.
+
+Bu çalışmada "besiktas" hashtagi ile atılmış son 1000 adet tweeti incelemek istiyorum. Bir önceki blog paylaşımımda Twitter üzerinden veri çekme işleminin nasıl gerçekleştirileceği ile ilgili gerekli işlemleri göstermiştim. Aynı adımları <mark>#besiktas</mark> hashtagi üzerinden tekrarlayacağım.
+
+```{r, eval= FALSE}
+library(twitteR)
+library(ROAuth)
+library(openssl)
+library(httpuv)
+
+options(httr_oauth_cache=T)
+
+consumer_key <- "xxxxxxxxxxxxxxxxxxxxxx"
+consumer_secret <- "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+access_token <- "xxxxxxxxx-xxxxxxxxxxxxxxxxxxxxxxx"
+access_secret <- "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+
+setup_twitter_oauth(consumer_key, consumer_secret, access_token, access_secret)
+
+```{r, include=FALSE}
+#RDS Dosyasını lokalden okuyoruz
+
+tweets.df <- readRDS("C:/--DOSYALARIM/R-Projects/Github_Page/website-hugo/static/Veri/tweets.df2.rds")
+
+```
+
+```{r, eval=FALSE}
+tweets <- searchTwitteR("#besiktas", n=1000,  locale = "tr_TR")
+
+tweets.df <- twListToDF(tweets)
+```
+
+```{r, include=FALSE}
+#RDS Dosyasını lokalden okuyoruz
+
+tweets.df <- readRDS("C:/--DOSYALARIM/R-Projects/Github_Page/website-hugo/static/Veri/tweets.df2.rds")
+
+```
+
+```{r}
+tweet_clean <- tweets.df
+
+library(stringi)
+library(stringr)
+library(tm)
+
+tweet_clean$text <- stri_enc_toutf8(tweet_clean$text)
+```
+
+Atılan tweetlerin içeriklerine hızlı bir şekilde göz atıldığında tweetlerin kişilerin kendisinin attığı tweet, bazılarının ise Retweet (RT) olduğu görülecektir. Retweet'leri ayırmak amacıyla Twitter'dan gelen verilerin başında "RT" ifadesinin olduğu görülecektir. Eğer tweetler RT ise bu "RT" ifadesini kaldırmak amacıyla aşağıdaki kodu kullanıyorum.
+
+```{r}
+#RT ifadelerinin kaldırılması
+tweet_clean$text <- ifelse(str_sub(tweet_clean$text,1,2) == "RT",
+                           substring(tweet_clean$text,3),
+                           tweet_clean$text)
+```
+
+Tweetlerin içerisinde hala; rakamlar, URL linkler, "@" ve "#" sembolleri, emojiler ve  yabancı içerikleri gösteren unicode ifadeler gibi temizlenmesi gereken bir çok içerik bulunmaktadır. Bu tür bir metin temizliği işlemleri ile ilgili olarak aşağıda toplu olarak belirtilen kodları oluşturdum. Yapmış olduğum her işlemin içeriği, kodların üzerinde yer alan başlıkdan izlenebilmektedir. String tespit işlemlerinde yine `stringr` ve Base R fonksiyonlarını kullanacağım. 
+
+Bir önceki blog paylaşımımda çok kısa olarak kullandığım Kurallı İfadeler (Regular Expressions-Regex) bu bölümde çok daha sık kullanılmaktadır. Regex'ler hakkında detaylı bilgiye sahip olmak isteyenler [bu kitabı](http://www.gastonsanchez.com/r4strings/) inceleyebilirler.
+
+```{r}
+#URL linklerinin temizlenmesi
+tweet_clean$text <- str_replace_all(tweet_clean$text, "http[^[:space:]]*", "")
+
+
+#Hashtag "#" ve "@" işaretlerinin kaldırılması
+tweet_clean$text <- str_replace_all(tweet_clean$text, "#\\S+", "")
+tweet_clean$text <- str_replace_all(tweet_clean$text, "@\\S+", "")
+
+#Noktalama işaretlerinin temizlenmesi
+tweet_clean$text <- str_replace_all(tweet_clean$text, "[[:punct:][:blank:]]+", " ")
+
+#Tümh harflerin küçük harfe dönüştürülmesi
+tweet_clean$text  <- str_to_lower(tweet_clean$text, "tr")
+
+#Rakamların temizlenmesi
+tweet_clean$text <- removeNumbers(tweet_clean$text)
+
+#ASCII formatına uymayan karakterlerin temizlenmesi
+tweet_clean$text <- str_replace_all(tweet_clean$text, "[<].*[>]", "")
+tweet_clean$text <- gsub("\uFFFD", "", tweet_clean$text, fixed =  TRUE)
+tweet_clean$text <- gsub("\n", "", tweet_clean$text, fixed =  TRUE)
+
+#Alfabetik olmayan karakterlerin temizlenmesi
+tweet_clean$text <- str_replace_all(tweet_clean$text, "[^[:alnum:]]"," " )
+```
+
+
+### Etkisiz Kelimeler (Stop Words)
+
+Etkisiz kelimeler (Stop Words) herhangi bir dilde sıkça kullanılan, içerikten bağımsız kelimeler, bağlaçlar, imleçler, sayılar, kalıplaşmış kısaltmalar vb. ifadelerdir (Türkçe’de “bir”, “bu”, “şu” gibi). Bu kelimeler içeriğe genellikle bir anlam katmadığı için metin madenciliği çalışmlarında, hatta arama motorlarında göz ardı edilmektedir.
+
+İncelenecek dile uygun olarak kullanılan etkisiz kelime arşivinden  kelimelerin, incelediğimiz metin dökümanındaki kelimelerle eşleştirilmesi, eğer eşleşme varsa elimizdeki metin dökümanından bu kelimelerin dışlanması gerekmektedir
+
+`tidytext` paketinin içerisinde otomatik olarak İnglizce etkisiz kelimeler arşivi gelmektedir. Fakat Türkçe için manuel olarak arşivin bulunması gerekmektedir. İnternette yaptığım arama sonucu; GitHub'da bir kullanıcının oluşturmuş olduğu 10.000 kelimelik Türkçe Etkisiz Kelimeler [arşivini](https://github.com/ahmetax/trstop) buldum. Arşivdekli kelimeleri daha sonra ayrı bir excel dosyasına kaydettim.
+
+```{r, include=FALSE}
+#RDS Dosyasını lokalden okuyoruz
+library(readxl)
+Turkish_Stopwords <- read_excel("C:/--DOSYALARIM/R-Projects/Github_Page/website-hugo/static/Veri/Turkish-Stopwords.xlsx")
+```
+
+```{r, eval=FALSE}
+#RDS Dosyasını lokalden okuyoruz
+library(readxl)
+Turkish_Stopwords <- read_excel("Turkish-Stopwords.xlsx")
+```
+
+```{r}
+head(Turkish_Stopwords)
+```
+
+### Tidytext ile içerik analizi
+
+Daha öncede belirttiğim gibi, `tidytext` paketi tidyverse ekosisteminin tamamıyla uyumlu bir şekile çalışmakta, metinsel içerikleri tidy data formatında değerlendirmektedir. İçerisinde yer alan `unnest_tokens()` fonksiyonu ile string ifadeleri içerisindeki her bir kelime ayrı olarak satırlara dağıtılabilmektedir. Veri formatı bu şekle geldikten sonra `dplyr` ve `ggplot2` paketleri ile sorunsuz olarak çalışılabilecektir.
+
+
+```{r}
+library(tidytext)
+library(dplyr)
+library(ggplot2)
+
+tidy_tweets <- tweet_clean %>% select(text) %>% 
+  mutate(linenumber = row_number()) %>% unnest_tokens(word, text)
+
+tidy_tweets <- tidy_tweets %>% anti_join(Turkish_Stopwords, by=c("word"="STOPWORD"))
+
+head(tidy_tweets)
+```
+
+Tweetlerde kullanılan bütün kelimeler `tidy_tweets` Data Frame objesinde birer satır olarak belirtildiği için en çok hangi kelimelerin kullanıldığına aşağıdaki şekilde bakabiliriz.
+
+```{r}
+tidy_tweets %>%
+  count(word, sort = TRUE) %>%
+  filter(n > 20) %>%
+  mutate(word = reorder(word, n)) %>%
+  ggplot(aes(word, n)) +
+  geom_col() +
+  xlab(NULL) +
+  coord_flip() + theme_minimal() +
+  ggtitle("Tweetlerde en çok kullanılan kelimeler")
+```
+
+
+Yukarıda gösterilen görsele benzer olarak `wordcloud` paketi ile kelimelerin kullanım sıkılığına bağlı olarak ön plana çıkan kelimeleri, kelime bulutları şeklinde görselleştirebiliriz. Kelime bulutunu oluşturmak için gerekli kod aşağıda gösterilmektedir.
+
+```{r}
+library(wordcloud)
+
+tidy_tweets %>% 
+  count(word) %>%
+  with(wordcloud(word, n, max.words = 100))
+```
+
+
+
+
+
+
+

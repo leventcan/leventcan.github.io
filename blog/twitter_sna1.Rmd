@@ -1,0 +1,289 @@
+---
+title: "Twitter ile Sosyal Ağ Analizi"
+description: "Twitter API'den çekilecek verilerle sosyal ağların görselleştirilmesi"
+date: '2018-03-18'
+type: "post"
+tags: [
+ "Twitter",
+ "Veri Görselleştirme",
+ "Sosyal ağ analizi",
+ "R programlama dili",
+ "Twitter Veri Çekme",
+ "Twitter API",
+ "Network Analizi"
+]
+keywords: [
+"Twitter"
+]
+slug: "twitter-ile-sosyal ağ analizi"
+coverImage: /
+draft: false
+output:
+  md_document:
+    variant: markdown
+---
+
+<style>
+body {
+text-align: justify}
+</style>
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set( warning = FALSE, message = FALSE, echo = TRUE)
+extrafont::loadfonts(device="win")
+options(httr_oauth_cache=T)
+```
+
+## Twitter API
+
+Günümüzde giderek kompleksleşen sosyal ilişkiler bu ilişkilerin ağ felsefesinde incelenmesi ihtiyacını ortaya çıkarmaktadır. Sosyal ağlara yapısına ilişkin veriler geçmişte anketler ve diğer ikincil kaynaklardan bulunmakta ve erişimi çok zor ve zahmetli iken, günümüzde  Twitter, Facebook, Youtube gibi devasa sosyal medya platformlarının ön plana çıkmasıyla bu platformlardan üretilen ve ağ yapısını gösteren verilere kolayca erişilebilmektedir.
+
+Bu ortamlarda üretilen veriler geliştirici ve kullanıcılara  API (Application Program Interface) olarak adlandırılan kanallar üzerinden verilmektedir. 
+
+Bu blog yazımda Twitter'daki verileri R üzerinden nasıl işlenip, analiz edilebileceği ile ilgili küçük bir örnek çalışma yapacağım.
+
+Twitter'da bulunan tweet verilerine erişmenin en kolay yolu `twitteR` paketini kullanmaktır. Bu paketi kullanarak kişisel twitter hesabına ilişkin bazı işlemleri yapabilir, ayrıca Twitter da  kullanıcılar tarafından atılan tweetlere, çeşitli parametrelere göre erişilebilmektedir. `twitteR` paketini kullanmadan önce yapılması gereken bazı işlemler bulunmaktadır. Herşeyden önce bir Twitter hesabınız bulunmalıdır. Hesap varsa [Twitter Developer Platform](https://developer.twitter.com/) üzerinden kişisel hesap bilgileri ile giriş yaptıktan sonra API ve Token'e ilişkin Key ve Secret kodlarınının üretilmesi gerekmektedir.
+
+Daha sonra R'a giriş yaptıktan sonra üretilmiş olunan API ve Token bilgilerini R ortamına tanıtılması gerekmektedir.
+
+```{r, eval= FALSE}
+library(twitteR)
+library(ROAuth)
+library(openssl)
+library(httpuv)
+
+options(httr_oauth_cache=T)
+
+consumer_key <- "xxxxxxxxxxxxxxxxxxxxxx"
+consumer_secret <- "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+access_token <- "xxxxxxxxx-xxxxxxxxxxxxxxxxxxxxxxx"
+access_secret <- "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+
+setup_twitter_oauth(consumer_key, consumer_secret, access_token, access_secret)
+```
+
+
+Yetkilendirme bilgileri tanımlandıktan sonra, belirli sorgularla Twitter üzerinden veriler çekilebilir hale gelinecektir. Oluşturulacak sorgularda, hashtag içeriği, tweetin kim tarafından atıldığı, kime tweet atıldığı, zaman aralığı gibi bir çok parametre belirlenebilmektedir. Sorgulardaki parametreler ile ilgili detaylara pakete ilişkin [CRAN](https://cran.r-project.org/web/packages/twitteR/twitteR.pdf) dökümantasyonunda ulaşılabilmektedir.
+
+Uygulayacağım bu örnekte Türkiye'deki Twitter gündeminde tansiyonun hiç düşmediği #bedelliaskerlik hashtagi üzerinden atılan en son 300  tweeti çekeceğim. Her ne kadar çekilecek tweet sayısını 300 olarak tanımladıysam da, eğer konuyla ilgili atılmış tweet sayısı belirlediğim sayıdan az ise API sonucu olarak bununla ilgili uyarı verilecek ve ne kadar tweet varsa yalnız o sayıda sonuçlar elde edilecektir.
+
+API'nin transfer ettiği dosya JSON formatında olduğu için R ortamında bu veri "List" formatına çevrilmiş olarak bize sunulmaktadır `twitteR` paketinde bulunan `twListToDF()` komutu ile List yapısında bulunan objeyi Data Frame formatına hızlıca dönüştürülebilmektedir.
+
+
+```{r, eval=FALSE}
+tweets <- searchTwitteR("#bedelliaskerlik", n=300,  locale = "tr_TR")
+
+tweets.df <- twListToDF(tweets)
+```
+
+Verileri Data Frame formatına çevirdikten sonra veri yapısı ve içerisinde bulunan değişkenler incelenebilir. 
+
+
+```{r, include=FALSE}
+#RDS Dosyasını lokalden okuyoruz
+
+tweets.df <- readRDS("C:/--DOSYALARIM/R-Projects/Github_Page/website-hugo/static/Veri/tweets.df.rds")
+
+```
+
+
+```{r}
+colnames(tweets.df)
+```
+
+Ama bizim çalışmamız açısından ber bir tweet için iki önemli değişken vardır. `tweets.df` Data Frame'i içerisindeki `text` kolonunda  tweetlerin içeriği, `screenName` kolonunda ise tweeti atan kişiye ilişkin bilgiye ulaşılabilmektedir. Bu iki kolonun içerisinde yer alan bilgiler sosyal ağ ilişkilerini göstermek açısından yeterli içerik sağlamaktadır.
+
+Bu veriler üzerinden sosyal ağ analizine geçmeden önce sosyal ağ analizi ile ilgili bazı temel kavramlara ve R ekosistemindeki araçlara değinmek istiyorum.
+
+## Sosyal Ağ Analizi
+
+### Veri Yapısı
+
+Sosyal ağ analizleri ile ilgili araçları, fonksiyonel olarak ağların istatistiki yapısını incelemeye ve görselleştirme odaklanması bakımından ikiye ayırabiliriz. Görselleştirme ile ilgili statik görselleştirme işlevi olan ve Javascript destekli interaktif görseller üretmeye olanak sağlayan paketler bulunmaktadır. 
+
+Ağ analizine başlamadan önce veri yapısının, ağ ilişkilerine göstercek bir yapıya göre hazırlanması gerekmektedir. Burada temel olarak birbiriyle ilişkili iki adet veri setine ihtiyaç vardır.
+
+- **Düğüm Noktaları (Nodes):** Düğüm noktaları, ilişki sistemi içerisindeki aktörleri göstermektedir. Twitterdaki veri setlerinden örnek vermek gerekirse buradaki düğüm noktaları, tweetleri atan her bir kullanıcıdır.
+- **Ayrıtlar (Edges):** Ayrıtlar, düğüm noktaları arasındaki ilişkin varlığını ve yoğunluğunu göstermektedir. Aktörler arasındaki ilişki yönlendirilmiş (directed) veya yönlendirilmemiş (undirected) şeklinde iki formda olabilmektedir. Örneğin; iki aktör arasında arkadaşlık ilişkisi var ise bu yönlendirilmemiş bir ilişkidir. Fakat ileriki kısımlarda görülebileceği gibi Twitter örneğinde tweeti atan bir kullanıcı ve bu tweet içerisinde etiketlenen başka bir kullanıcı bulunmaktadır. Buradaki ilişki yönlendirilmiş ilişkidir.
+
+Sıradaki işlemde yukarıda oluşturmuş olduğumuz `tweets.df` dataframe objesinden düğüm noktaları ve ayrıtları gösteren iki ayrı veri setini oluşturmamız gerekiyor. Fakat Twitter API'sinden sağlanan veriden  düğüm ve ayrıt bilgileri kolayca elde edilememekte, bazı veri temizlik ve düzenleme işlemlerine ihtiyaç bulunmaktadır. Düzenlemeyle ilgili işlemler için `dplyr` paketini kullanmayı tercih ediyorum. Yukarıdaki bölümün sonunda `tweets.df`'nin yapısını ve içerdiği değişkenleri incelemiştik. Tweeti atan kişinin bilgisini `screenName` kolonundan görebiliyor iken, kime atıldığı bilgisini doğrudan bir kolon ile beraber görememekteyiz. Çünkü `text` kolonu içerisinde atılan tweet ile ilgili tüm içerikler bulunmaktadır. Bu kolondaki herhangi bir gözlem incelendiğinde hem hashtag(#) ile tweet atılan konu, "@" sembolü ve kullanıcı adı yazılarak tweetin yönlendirildiği kişi, linkler, emojiler, noktalama işaretleri, yabancı karakterler ve diğer çeşitli bir çok metinsel içerik bulunmaktadır. Peki bu kolon içerisindeki içerikten "@" işareti ve hemen yanında yer alan kullanıcı ismini nasıl çekip çıkaracağız ? (Kimi durumlarda tweet birden fazla kişiye de yönlendirilebilmektedir!)
+
+Bu tip konularda devreye <mark>Kurallı İfadeler</mark> (Regular Expressions - Regex) girmektedir. Kurallı ifadelere ilişkin ortak standartlar bir çok programramla dilinde bulunmakla birlikte temel olarak metinsel ifadelerdeki belirli örüntüye (pattern) uyan içerikleri, tespit etmek amacıyla kullanılırlar. Özellikle webden elde edilen verilerle çalışan araştırmacılar için kurallı ifadeler hakkında belirli düzeyde bilgi çok kritik öneme sahiptir. Kurallı ifadelerle ilgili detaylı bilgiler bu yazının kapsamını aşmakta olup, konuyla ilgilenen kişiler bu [sayfayı](https://www.regular-expressions.info/quickstart.html) inceleyebilirler. 
+
+Yeniden tweet atılan kişinin `text` kolonu içerisindeki metin ifadesinden nasıl tespit edilip, ayrıştırılacağı meselesine dönecek olursak, burada kullanacağımız regex aşağıdaki şekilde olacaktır. Çalışma boyunca örüntü yapılarını tespit etmek ve yerine gelecek ifadeleri belirlemek için `stringr` paketini, kısmen de Base R bünyesinde bulunan `gsub` fonksiyonunu kullanıyor olacağım. Aşağıdaki kodda "@" sembolü ile belirtilen hedef kullanıcı adlarını çektikten sonra tweeti atan kullanıcı ile ayrı bir Data Frame içerisine yerleştiriyorum. Daha önce de belirttiğim gibi tweeti atan bir kullanıcı hedef olarak birden fazla kullanıcıyı hedef alabilmekteydi. Bu sebeple yeni oluşturduğumuz `network_data` isimli DataFramedeki `to_who` kolonu List formatında birden fazla kullanıcıya ilişkin bilgiyi tutmaktadır. Buradaki list formatındaki kolonu, data frame'e çevirmek için `list2df` fonksiyonunu kullanacağım. 
+
+```{r}
+
+library(stringr)
+library(dplyr)
+library(tibble)
+library(qdapTools)
+
+tweets.df.simple <- tweets.df %>% select(screenName, text)
+
+tweets.df.simple$to_who <- str_extract_all(tweets.df.simple$text, "@\\S+")
+
+tweets.df.simple <- tweets.df.simple %>% select(screenName, to_who) %>%
+  rowid_to_column("index")
+
+network_data <- list2df(tweets.df.simple$to_who, "col1")
+network_data$X2 <- as.integer(network_data$X2)
+network_data <- network_data %>% left_join(tweets.df.simple, 
+                                       by = c("X2" = "index")) %>%
+  select(col1, screenName) %>%
+  rename(source = screenName,
+         target = col1) %>%
+  select(source, target)
+```
+
+
+Twitter'da kullanıcı adı yalnızca alfanumerik karakterler (A-Z arasındaki büyük ve küçük ingilizce harfler ve 0-9 arasındaki rakamlar) veya alt çizgi ("_") içerebilirmektedir. Hedef kullanıcılarına ilişkin bilgiler kurallı ifadeler ile çekildikten kullanıcı isimlerinin yanında bazı noktalama işaretleri olabilmektedir. Bu sebeple bu ifadelerin de kullanıcı isimlerinden temizlenmesi gerekmektedir.
+
+```{r}
+#Alfanumerik karakterler ve alt çizgi hariç tüm karakterlerin yok edilmesi
+network_data$target <- gsub("[^a-zA-Z_0-9]", "", network_data$target)
+```
+
+Son durum itibariyle `network_data` data frame'inin yapısı aşağıdaki şekilde olup ylnızca `source` ve `target` şeklinde iki adet kalmış olacaktır.
+
+```{r}
+head(network_data)
+```
+
+### Ağ Görselleşirmesi
+
+Ağ ilişkisi verilerini göstermek için geliştirilen bir çok paket bulunmaktadır. Bu çalışmamda `ggraph` ve `networkD3` isimli iki adet paket kullanacağım. Bunlardan birinci olan `ggraph` paketini statik ağ grafiklerini, `networkD3` paketi ise dinamik ve interaktif ağ grafiklerini oluşturmak için kullanılmaktadır.
+
+Ağ görselleştirmesi ilgili yapılan çalışmalar incelendiğinde genellikle `igraph` paketinin kullanıldığı görülmektedir. Fakat yakın bir zamanda Thomas Lin Pedersen tarafından geliştirilmiş olan `ggraph` paketi ile `tidyverse` ekosistemine uygun bir syntax ile ggplot2 tarzı ağ grafikleri oluşturulabilmektedir. `ggraph` içerisinde yer alan fonksiyonların bir çoğu `igraph` fonksiyonların wrapper fonksiyonu niteliğinde olduğu için bu paketi kullandığınızda `igraph` paketinin gücü ve esnekliğinden de vazgeçmemiş olmaktayız.
+
+Ağ görsellerini oluşturmak için `ggraph` paketi Düğümler (Nodes) ve Ayrıtlar (Edges) olarak iki farklı Data Frame objesinin olmasını istemektedir. Düğümlerin olduğu Data Frame objesinde her bir özgün düğüm noktasının belirtildiği (`label`) ve düğüm nokrasına ilişkin bir indeks değeri (`id`) şeklinde iki adet değişkene ihtiyaç bulunmaktadır. Ayrıtların olduğu data frame objesinde ise `nodes` data frame objesinde belirtilen her bir indeks değeri dikkate alınarak hangi düğümden (`from`) hangi düğüme (`to`) etkileşim olduğunu belirten iki değişkene, ayrıca bu değişkenler arasındaki ilişkinin yoğunlğunu belirten bir değişkene (`weight`) ihtiyaç bulunmaktadır. Bizim örneğimizdeki `weight` değişkeni `from` kolonunda belirtilen kişinin `to` kolonunda belirtilen kişiyi etiketleyerek kaç  tweet attığını göstermektedir.
+
+```{r}
+library(ggraph)
+library(tidygraph)
+```
+
+
+```{r}
+
+#Nodes (Vertex)
+
+sources <- network_data %>%
+  distinct(source) %>%
+  rename(label = source)
+
+targets <- network_data %>%
+  distinct(target) %>%
+  rename(label = target)
+
+nodes <- full_join(sources, targets, by = "label") %>% rowid_to_column("id")
+
+#Edges
+
+tweet_from_to <- network_data %>%  
+  group_by(source, target) %>%
+  summarise(weight = n()) %>% 
+  ungroup()
+
+
+edges <- tweet_from_to %>% 
+  left_join(nodes, by = c("source" = "label")) %>% 
+  rename(from = id) %>%
+  left_join(nodes, by = c("target" = "label")) %>% 
+  rename(to = id) 
+
+edges <- select(edges, from, to, weight)
+
+# Nodes Size
+
+nodes <- nodes %>% left_join((edges %>% group_by(to) %>% 
+                                summarise(node_size=sum(weight)) %>%
+                                select(to,node_size)),
+                             by = c("id" = "to")) %>%
+  mutate(node_size = ifelse(is.na(node_size),
+                            1,
+                            node_size +1))
+
+
+```
+
+Yapılan işlemler sonucu `nodes` ve `edges` data frame dosyalarının son hali aşağıdaki şekilde olacaktır.
+
+```{r}
+head(nodes)
+
+head(edges)
+```
+
+`ggraph` ile görseli oluşturmadan önce `tbl_graph()` fonksiyonu ile  `nodes` ve `edges` objelerini `ggraph` objelerine çevirmemiz gerekmektedir. Yaratılan `tweet_ggraph` objesinin görünümü de aşağıdaki şekilde olacaktır. Bu arada `class()` fonksiyonunun sonucu da incelendiğinde `tweet_ggraph` objesinin, hem `tbl_graph` objesi aynı zamanda `igraph` objesi olduğu görülecektir. 
+
+```{r}
+tweet_ggraph <- tbl_graph(edges = edges, nodes = nodes, directed = TRUE)
+
+class(tweet_ggraph)
+
+tweet_ggraph
+
+```
+
+`ggraph()` fonksiyonunun syntax yapısı `ggplot2` ile büyük ölçüde benzerdir. Birbirinden farklı katmanlar `+` işareti ile birleştirilmekte, grafiklerde yapılacak özelleştirmeler her bir katmanın içerinde belirlenmektedir. Aşağıdaki örnekte minimum kodla, en sade formatta oluşturulan ağ grafiği bulunmaktadır.
+
+```{r}
+
+ggraph(tweet_ggraph) + geom_edge_link() + geom_node_point() + theme_graph()
+
+```
+
+Şimdi bu grafiği biraz özelleştirelim. Dikkat edildiği üzere yaptığım özelleştirmelerin hepsi `ggplot2` API sinde olan özelliklerle uyumludur.
+
+```{r}
+ggraph(tweet_ggraph) + geom_edge_link(aes(size=weight),alpha = 0.5) +
+  geom_node_point(aes(size=node_size, color= node_size)) + 
+  theme_graph() +
+  theme(text=element_text(family="Calibri",  size=12, face="plain"),
+        plot.title=element_text(family="Calibri", face = "plain")) +
+  labs(size="Alınan Tweet Sayısı") +
+  scale_colour_gradient(low = "#132B43", high = "#56B1F7",guide = FALSE)
+```
+
+Dinamik ağ grafiklerinin oluşturulmasında ise `networkD3` paketini kullanacağım. Yalnız verilerin bulunduğu Data Frame objelerinde küçük bir değişikliğin yapılması gerekmektedir. R programlama dilinde sayma işlemi 1'den başladığı için düğümlerin numaralandırıldığı `id` kolonunda her bir düğüm 1'den başlayarak numaralandırılmıştır. Dinamik ağ paketleri Javascript ile kodlandığı ve Javascript'te sayma işlemi 0'dan başladığı için `networkD3` paketinde kullanılacak Data Frame objelerindeki indeks numaralarının 0'dan başlaması gerekmektedir. Bu yüzden indeks numaralarının kullanıldığı kolonlardaki numaraların 1 eksiltmemiz yeterlidir.
+
+```{r}
+library(networkD3)
+
+nodes_d3 <- mutate(nodes, id = id - 1)
+edges_d3 <- mutate(edges, from = from - 1, to = to - 1)
+
+forceNetwork(Links = edges_d3, Nodes = nodes_d3, Source = "from", Target = "to", 
+             NodeID = "label", Group = "id", Value = "weight", 
+             opacity = 1, fontSize = 16, zoom = TRUE, Nodesize = "node_size")
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

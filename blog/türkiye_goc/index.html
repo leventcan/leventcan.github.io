@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="chrome=1">
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="referrer" content="no-referrer">
+<meta name="author" content="Leventcan Gültekin">
+<meta name="description" content="Bu blog paylaşımımda Türkiye&#39;deki iller arası göç verilerinden dinamik Sankey akış grafiğinin oluşturulması ilgili süreçlere değineceğim">
+
+<meta property="og:title" content="Türkiye&#39;de Bölgeler Arası Göç Akışları" />
+<meta property="og:description" content="Bu blog paylaşımımda Türkiye&#39;deki iller arası göç verilerinden dinamik Sankey akış grafiğinin oluşturulması ilgili süreçlere değineceğim" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="/blog/t%C3%BCrkiye_goc/" />
+
+
+
+<meta property="article:published_time" content="2018-07-15T00:00:00&#43;00:00"/>
+
+<meta property="article:modified_time" content="2018-07-15T00:00:00&#43;00:00"/>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<title>
+
+
+     Türkiye&#39;de Bölgeler Arası Göç Akışları 
+
+</title>
+<link rel="canonical" href="/blog/t%C3%BCrkiye_goc/">
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:400,700|Ubuntu+Mono:400,400i,700,700i|Raleway:500">
+
+
+
+    
+    <link rel="stylesheet" href="/css/reset.css?t=2018-12-06%2017%3a39%3a54.6572406%20%2b0300%20%2b03%20m%3d%2b0.502955901">
+    <link rel="stylesheet" href="/css/pygments.css?t=2018-12-06%2017%3a39%3a54.6572406%20%2b0300%20%2b03%20m%3d%2b0.502955901">
+    <link rel="stylesheet" href="/css/main.css?t=2018-12-06%2017%3a39%3a54.6572406%20%2b0300%20%2b03%20m%3d%2b0.502955901">
+    
+        <link rel="stylesheet" href="/css/override.css?t=2018-12-06%2017%3a39%3a54.6572406%20%2b0300%20%2b03%20m%3d%2b0.502955901">
+    
+
+
+
+
+<link rel="shortcut icon"
+
+    href="/img/leaf.ico"
+
+>
+
+
+
+
+
+
+
+
+</head>
+
+
+<body lang="tr">
+
+<link rel="stylesheet" href="/css/github.css" rel="stylesheet" id="theme-stylesheet">
+<script src="/js/highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+<section class="header">
+    <div class="container">
+        <div class="content">
+            
+                
+                
+                
+                
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                
+                <a href="/"><img class="avatar" src="/img/lg_pic.jpg" srcset="/img/lg_pic.jpg 1x"></a>
+            
+            <a href="/"><div class="name">Leventcan Gültekin</div></a>
+            
+            <nav>
+                <ul>
+                    
+                        <li class="nav-blog"><a href="/blog/"><span>Blog</span></a></li>
+                    
+                        <li class="nav-about"><a href="/about/"><span>Hakkımda</span></a></li>
+                    
+                </ul>
+            </nav>
+        </div>
+    </div>
+</section>
+
+<section class="icons">
+    <div class="container">
+        <div class="content">
+        
+            <a href="https://github.com/leventcan" target="_blank" rel="noopener"><img class="icon" src="/img/github.svg" alt="github" /></a>
+        
+
+        
+
+        
+
+	
+
+        
+
+        
+
+        
+            <a href="https://www.linkedin.com/in/leventcan-gultekin/" target="_blank" rel="noopener"><img class="icon" src="/img/linkedin.svg" alt="linkedin" /></a>
+        
+
+        
+
+        
+
+        
+
+        
+
+        
+
+        
+
+        
+
+        
+        </div>
+    </div>
+</section>
+
+<section class="main">
+    <div class="container">
+        <div class="content">
+            <div class="page-heading">
+
+    Türkiye&#39;de Bölgeler Arası Göç Akışları
+
+</div>
+
+            <div class="markdown">
+                <link href="/rmarkdown-libs/font-awesome/css/fa-svg-with-js.css" rel="stylesheet" />
+<script src="/rmarkdown-libs/font-awesome/js/fontawesome-all.min.js"></script>
+<script src="/rmarkdown-libs/font-awesome/js/fa-v4-shims.min.js"></script>
+<script src="/rmarkdown-libs/htmlwidgets/htmlwidgets.js"></script>
+<script src="/rmarkdown-libs/plotly-binding/plotly.js"></script>
+<script src="/rmarkdown-libs/typedarray/typedarray.min.js"></script>
+<script src="/rmarkdown-libs/jquery/jquery.min.js"></script>
+<link href="/rmarkdown-libs/crosstalk/css/crosstalk.css" rel="stylesheet" />
+<script src="/rmarkdown-libs/crosstalk/js/crosstalk.min.js"></script>
+<link href="/rmarkdown-libs/plotlyjs/plotly-htmlwidgets.css" rel="stylesheet" />
+<script src="/rmarkdown-libs/plotlyjs/plotly-latest.min.js"></script>
+
+
+<style>
+body {
+text-align: justify}
+</style>
+<div id="veri-hazrlk-asamas" class="section level2">
+<h2>Veri Hazırlık Aşaması</h2>
+<p>TÜİK’in websitesindeki <a href="http://www.tuik.gov.tr/PreTabloArama.do?metod=search&amp;araType=vt">veritabanları</a> bölümünde iller arasıdaki göç matrisi, istenilen yıl detayında oluşturulup indirilebilmektedir.</p>
+<pre class="r"><code>library(readxl)
+
+#Verilerin olduğu excel dosyasının içe aktarılması
+nuts3_goc &lt;- read_excel(&quot;nuts3_goc.xlsx&quot;, sheet = &quot;data&quot;)
+
+nuts3_goc$YIL &lt;- as.integer(nuts3_goc$YIL)
+
+#İBBS tipolojisi ile eşleştirme yapmak için
+trkod &lt;- read_excel(&quot;trkod.xlsx&quot;)</code></pre>
+<p>´nuts3_goc´ dataframe objesinde yer alan göç matrisinin görünümü aşağıdaki şekildedir.</p>
+<pre class="r"><code>head(nuts3_goc)
+## # A tibble: 6 x 83
+##     YIL FROM_IL Adana Adıyaman Afyonkarahisar  Ağrı Aksaray Amasya Ankara
+##   &lt;int&gt; &lt;chr&gt;   &lt;dbl&gt;    &lt;dbl&gt;          &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;
+## 1  2015 Adana       0      816            342   263     389    159   3764
+## 2  2015 Adıyam~   905        0             92   136      68     40    986
+## 3  2015 Afyonk~   235       67              0   118      65     62   1921
+## 4  2015 Ağrı      247      129            189     0      95     89   2749
+## 5  2015 Aksaray   459       54            140    39       0     50   1956
+## 6  2015 Amasya    129       40             48   101      29      0   1982
+## # ... with 74 more variables: Antalya &lt;dbl&gt;, Ardahan &lt;dbl&gt;, Artvin &lt;dbl&gt;,
+## #   Aydın &lt;dbl&gt;, Balıkesir &lt;dbl&gt;, Bartın &lt;dbl&gt;, Batman &lt;dbl&gt;,
+## #   Bayburt &lt;dbl&gt;, Bilecik &lt;dbl&gt;, Bingöl &lt;dbl&gt;, Bitlis &lt;dbl&gt;, Bolu &lt;dbl&gt;,
+## #   Burdur &lt;dbl&gt;, Bursa &lt;dbl&gt;, Çanakkale &lt;dbl&gt;, Çankırı &lt;dbl&gt;,
+## #   Çorum &lt;dbl&gt;, Denizli &lt;dbl&gt;, Diyarbakır &lt;dbl&gt;, Düzce &lt;dbl&gt;,
+## #   Edirne &lt;dbl&gt;, Elazığ &lt;dbl&gt;, Erzincan &lt;dbl&gt;, Erzurum &lt;dbl&gt;,
+## #   Eskişehir &lt;dbl&gt;, Gaziantep &lt;dbl&gt;, Giresun &lt;dbl&gt;, Gümüşhane &lt;dbl&gt;,
+## #   Hakkari &lt;dbl&gt;, Hatay &lt;dbl&gt;, Iğdır &lt;dbl&gt;, Isparta &lt;dbl&gt;,
+## #   İstanbul &lt;dbl&gt;, İzmir &lt;dbl&gt;, Kahramanmaraş &lt;dbl&gt;, Karabük &lt;dbl&gt;,
+## #   Karaman &lt;dbl&gt;, Kars &lt;dbl&gt;, Kastamonu &lt;dbl&gt;, Kayseri &lt;dbl&gt;,
+## #   Kilis &lt;dbl&gt;, Kırıkkale &lt;dbl&gt;, Kırklareli &lt;dbl&gt;, Kırşehir &lt;dbl&gt;,
+## #   Kocaeli &lt;dbl&gt;, Konya &lt;dbl&gt;, Kütahya &lt;dbl&gt;, Malatya &lt;dbl&gt;,
+## #   Manisa &lt;dbl&gt;, Mardin &lt;dbl&gt;, Mersin &lt;dbl&gt;, Muğla &lt;dbl&gt;, Muş &lt;dbl&gt;,
+## #   Nevşehir &lt;dbl&gt;, Niğde &lt;dbl&gt;, Ordu &lt;dbl&gt;, Osmaniye &lt;dbl&gt;, Rize &lt;dbl&gt;,
+## #   Sakarya &lt;dbl&gt;, Samsun &lt;dbl&gt;, Şanlıurfa &lt;dbl&gt;, Siirt &lt;dbl&gt;,
+## #   Sinop &lt;dbl&gt;, Şırnak &lt;dbl&gt;, Sivas &lt;dbl&gt;, Tekirdağ &lt;dbl&gt;, Tokat &lt;dbl&gt;,
+## #   Trabzon &lt;dbl&gt;, Tunceli &lt;dbl&gt;, Uşak &lt;dbl&gt;, Van &lt;dbl&gt;, Yalova &lt;dbl&gt;,
+## #   Yozgat &lt;dbl&gt;, Zonguldak &lt;dbl&gt;</code></pre>
+<p>´nuts3_goc´ dataframe objesinde belirli bir yılda her bir ilden diğer ile olan göç sayısı gösterilmektedir. Söz konusu matristeki (R’daki matris mantığında değil) göç veren iller satır olarak, göç alan iller ise kolon olarak gösterilmektedir. Fakat R ile ilgili paketlerin fonksiyonları genellikle <mark>tidy</mark> yani unpivot durumunda olan verileri girdi olarak kabul etmektedir. Bu yüzden ´nuts3_goc´ objesininde <code>tidyr</code> paketi ile gerekli dönüşüm işlemlerinin yapılması gerekmektedir.</p>
+<pre class="r"><code>library(tidyr)
+library(dplyr)
+
+# Verilerde temizlik ve hazırlık işlemleri
+
+nuts3_goc_temiz &lt;- nuts3_goc %&gt;% gather(TO_IL, SAYI, 4:ncol(nuts3_goc)) %&gt;%
+  left_join(trkod, by = c(&quot;FROM_IL&quot; = &quot;Duzey_3_Ad&quot;)) 
+
+colnames(nuts3_goc_temiz)[6:ncol(nuts3_goc_temiz)] &lt;- paste(&quot;FROM_&quot;, colnames(nuts3_goc_temiz)[6:ncol(nuts3_goc_temiz)], sep=&quot;&quot;)
+
+nuts3_goc_temiz &lt;- nuts3_goc_temiz %&gt;% left_join(trkod, by = c(&quot;TO_IL&quot; = &quot;Duzey_3_Ad&quot;))
+
+colnames(nuts3_goc_temiz)[13:ncol(nuts3_goc_temiz)] &lt;- paste(&quot;TO_&quot;, colnames(nuts3_goc_temiz)[13:ncol(nuts3_goc_temiz)], sep=&quot;&quot;)
+
+# Coğrafi Bölge Ölçeğinde gruplamanın yapılması ve ağ yapısının oluşturulması
+
+goc_data &lt;- nuts3_goc_temiz %&gt;% group_by(YIL, FROM_Cografi, TO_Cografi) %&gt;%
+  summarise(SAYI = sum(SAYI)) %&gt;% 
+  filter(FROM_Cografi != TO_Cografi) %&gt;%
+  ungroup()</code></pre>
+<pre class="r"><code># Verilerin net göç verisine dönüştürülmesi
+
+goc_data$NET_SAYI &lt;- NA
+
+for (i in unique(goc_data$YIL)){
+  
+  for (j in unique(goc_data$FROM_Cografi)){
+    
+    for (m in unique(goc_data$TO_Cografi)){
+      
+      goc_data$NET_SAYI[goc_data$YIL == i &amp; goc_data$FROM_Cografi == j &amp; 
+                          goc_data$TO_Cografi == m] &lt;- goc_data$SAYI[goc_data$YIL == i &amp; goc_data$FROM_Cografi == j &amp; 
+                                                                           goc_data$TO_Cografi == m] -
+        goc_data$SAYI[goc_data$YIL == i &amp; goc_data$FROM_Cografi == m &amp; 
+                            goc_data$TO_Cografi == j]
+      
+    }
+    
+  }
+  
+}</code></pre>
+<pre class="r"><code># Göç verilerinde yalnızca pozitif değerlere sahip olan bölgeleri almak verilen net göçü görmek için yeterlidir
+
+goc_data &lt;- goc_data %&gt;% filter(NET_SAYI &gt; 0) %&gt;% select(-SAYI) %&gt;%
+  filter(YIL == 2017)
+
+# Her bir coğrafi bölgeye indeks numarasının verilmesi
+
+index_nums &lt;- data.frame(bolge = unique(nuts3_goc_temiz$FROM_Cografi), FROM_index = c(0:6),
+                         TO_index = c(7:13))
+
+# Indeks numaralarının data frame e yerleştirilmesi
+
+goc_data &lt;- goc_data %&gt;% 
+  left_join(select(index_nums, -TO_index), by = c(&quot;FROM_Cografi&quot; = &quot;bolge&quot;)) %&gt;% 
+  left_join(select(index_nums, -FROM_index), by = c(&quot;TO_Cografi&quot; = &quot;bolge&quot;)) %&gt;%
+  arrange(FROM_index, TO_index)</code></pre>
+<pre class="r"><code>library(plotly)
+library(paletteer)
+
+# Sankey diyagramının oluşturulması
+
+plot_ly(
+  type = &quot;sankey&quot;,
+
+  orientation = &quot;h&quot;,
+  valuesuffix = &quot; Kişi&quot;,
+  valueformat = &quot;.0f&quot;, #,.2r #.0f
+  
+  node = list(
+    label = c(as.character(index_nums$bolge),as.character(index_nums$bolge)),
+    color = c(paletteer_d(ggsci, default_igv, 7), paletteer_d(ggsci, default_igv, 7)),
+    pad = 15,
+    thickness = 20,
+    line = list(
+      color = &quot;black&quot;,
+      width = 0.5
+    )
+  ),
+  
+  link = list(
+    source = as.vector(goc_data$FROM_index),
+    target = as.vector(goc_data$TO_index),
+    value =  as.vector(goc_data$NET_SAYI),
+    value =  as.vector(goc_data$NET_SAYI)
+  )
+) %&gt;% 
+  layout(
+    title = &quot;Türkiye&#39;de Coğrafi Bölgeler Arası Göç Akımları&quot;,
+    font = list(
+      size = 10
+    )
+    
+  )</code></pre>
+<div id="cfb019913048" style="width:672px;height:480px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="cfb019913048">{"x":{"visdat":{"cfb0619474ba":["function () ","plotlyVisDat"]},"cur_data":"cfb0619474ba","attrs":{"cfb0619474ba":{"orientation":"h","valuesuffix":" Kişi","valueformat":".0f","node":{"label":["Akdeniz","Güneydoğu Anadolu","Ege","Doğu Anadolu","İç Anadolu","Karadeniz","Marmara","Akdeniz","Güneydoğu Anadolu","Ege","Doğu Anadolu","İç Anadolu","Karadeniz","Marmara"],"color":["#5050FF","#CE3D32","#749B58","#F0E685","#466983","#BA6338","#5DB1DD","#5050FF","#CE3D32","#749B58","#F0E685","#466983","#BA6338","#5DB1DD"],"pad":15,"thickness":20,"line":{"color":"black","width":0.5}},"link":{"source":[0,0,0,0,0,0,1,1,1,1,1,3,3,3,3,4,4,5,5,5,6],"target":[8,9,10,11,12,13,9,10,11,12,13,9,11,12,13,9,13,9,11,13,9],"value":[4359,8899,1429,12534,2564,15489,7431,1726,3920,669,13756,12535,10247,3014,54499,3389,1185,3647,11462,26429,11166],"value.1":[4359,8899,1429,12534,2564,15489,7431,1726,3920,669,13756,12535,10247,3014,54499,3389,1185,3647,11462,26429,11166]},"alpha":1,"sizes":[10,100],"type":"sankey"}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"title":"Türkiye'de Coğrafi Bölgeler Arası Göç Akımları","font":{"size":10},"hovermode":"closest","showlegend":false},"source":"A","config":{"modeBarButtonsToAdd":[{"name":"Collaborate","icon":{"width":1000,"ascent":500,"descent":-50,"path":"M487 375c7-10 9-23 5-36l-79-259c-3-12-11-23-22-31-11-8-22-12-35-12l-263 0c-15 0-29 5-43 15-13 10-23 23-28 37-5 13-5 25-1 37 0 0 0 3 1 7 1 5 1 8 1 11 0 2 0 4-1 6 0 3-1 5-1 6 1 2 2 4 3 6 1 2 2 4 4 6 2 3 4 5 5 7 5 7 9 16 13 26 4 10 7 19 9 26 0 2 0 5 0 9-1 4-1 6 0 8 0 2 2 5 4 8 3 3 5 5 5 7 4 6 8 15 12 26 4 11 7 19 7 26 1 1 0 4 0 9-1 4-1 7 0 8 1 2 3 5 6 8 4 4 6 6 6 7 4 5 8 13 13 24 4 11 7 20 7 28 1 1 0 4 0 7-1 3-1 6-1 7 0 2 1 4 3 6 1 1 3 4 5 6 2 3 3 5 5 6 1 2 3 5 4 9 2 3 3 7 5 10 1 3 2 6 4 10 2 4 4 7 6 9 2 3 4 5 7 7 3 2 7 3 11 3 3 0 8 0 13-1l0-1c7 2 12 2 14 2l218 0c14 0 25-5 32-16 8-10 10-23 6-37l-79-259c-7-22-13-37-20-43-7-7-19-10-37-10l-248 0c-5 0-9-2-11-5-2-3-2-7 0-12 4-13 18-20 41-20l264 0c5 0 10 2 16 5 5 3 8 6 10 11l85 282c2 5 2 10 2 17 7-3 13-7 17-13z m-304 0c-1-3-1-5 0-7 1-1 3-2 6-2l174 0c2 0 4 1 7 2 2 2 4 4 5 7l6 18c0 3 0 5-1 7-1 1-3 2-6 2l-173 0c-3 0-5-1-8-2-2-2-4-4-4-7z m-24-73c-1-3-1-5 0-7 2-2 3-2 6-2l174 0c2 0 5 0 7 2 3 2 4 4 5 7l6 18c1 2 0 5-1 6-1 2-3 3-5 3l-174 0c-3 0-5-1-7-3-3-1-4-4-5-6z"},"click":"function(gd) { \n        // is this being viewed in RStudio?\n        if (location.search == '?viewer_pane=1') {\n          alert('To learn about plotly for collaboration, visit:\\n https://cpsievert.github.io/plotly_book/plot-ly-for-collaboration.html');\n        } else {\n          window.open('https://cpsievert.github.io/plotly_book/plot-ly-for-collaboration.html', '_blank');\n        }\n      }"}],"cloud":false},"data":[{"orientation":"h","valuesuffix":" Kişi","valueformat":".0f","node":{"label":["Akdeniz","Güneydoğu Anadolu","Ege","Doğu Anadolu","İç Anadolu","Karadeniz","Marmara","Akdeniz","Güneydoğu Anadolu","Ege","Doğu Anadolu","İç Anadolu","Karadeniz","Marmara"],"color":["#5050FF","#CE3D32","#749B58","#F0E685","#466983","#BA6338","#5DB1DD","#5050FF","#CE3D32","#749B58","#F0E685","#466983","#BA6338","#5DB1DD"],"pad":15,"thickness":20,"line":{"color":"black","width":0.5}},"link":{"source":[0,0,0,0,0,0,1,1,1,1,1,3,3,3,3,4,4,5,5,5,6],"target":[8,9,10,11,12,13,9,10,11,12,13,9,11,12,13,9,13,9,11,13,9],"value":[4359,8899,1429,12534,2564,15489,7431,1726,3920,669,13756,12535,10247,3014,54499,3389,1185,3647,11462,26429,11166],"value.1":[4359,8899,1429,12534,2564,15489,7431,1726,3920,669,13756,12535,10247,3014,54499,3389,1185,3647,11462,26429,11166]},"type":"sankey","textfont":{"fillcolor":"rgba(31,119,180,1)","color":"rgba(31,119,180,1)"},"frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1}},"base_url":"https://plot.ly"},"evals":["config.modeBarButtonsToAdd.0.click"],"jsHooks":{"render":[{"code":"function(el, x) { var ctConfig = crosstalk.var('plotlyCrosstalkOpts').set({\"on\":\"plotly_click\",\"persistent\":false,\"dynamic\":false,\"selectize\":false,\"opacityDim\":0.2,\"selected\":{\"opacity\":1}}); }","data":null}]}}</script>
+<p>Yukarıdaki grafikte yalnızca 2017 yılındaki coğrafi bölgeler arasındaki net göç akımları görülmektedir. Aşağıda yer alan Shiny uygulmasından diğer yıllara ilişkim gösterimde otomatik olarak hesaplanıp oluşturulmaktadır.</p>
+<div id="interaktif-uygulama" class="section level3">
+<h3>İnteraktif Uygulama</h3>
+<iframe width="700" height="600" scrolling="no" frameborder="no" src="https://leventcan.shinyapps.io/TR_Goc_Shiny2/">
+</iframe>
+</div>
+</div>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<script>
+window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+ga('create', 'UA-123-45', 'auto');
+ga('send', 'pageview');
+</script>
+<script async src='//www.google-analytics.com/analytics.js'></script>
+
+
+
+
+
+
+
+</body>
+</html>
+
