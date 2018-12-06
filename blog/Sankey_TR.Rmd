@@ -94,7 +94,6 @@ library(tidyr)
 library(dplyr)
 
 # Verilerde temizlik ve hazırlık işlemleri
-
 nuts3_goc_temiz <- nuts3_goc %>% gather(TO_IL, SAYI, 4:ncol(nuts3_goc)) %>%
   left_join(trkod, by = c("FROM_IL" = "Duzey_3_Ad")) 
 
@@ -105,7 +104,6 @@ nuts3_goc_temiz <- nuts3_goc_temiz %>% left_join(trkod, by = c("TO_IL" = "Duzey_
 colnames(nuts3_goc_temiz)[13:ncol(nuts3_goc_temiz)] <- paste("TO_", colnames(nuts3_goc_temiz)[13:ncol(nuts3_goc_temiz)], sep="")
 
 # Coğrafi Bölge Ölçeğinde gruplamanın yapılması ve ağ yapısının oluşturulması
-
 goc_data <- nuts3_goc_temiz %>% group_by(YIL, FROM_Cografi, TO_Cografi) %>%
   summarise(SAYI = sum(SAYI)) %>% 
   filter(FROM_Cografi != TO_Cografi) %>%
@@ -116,15 +114,11 @@ goc_data <- nuts3_goc_temiz %>% group_by(YIL, FROM_Cografi, TO_Cografi) %>%
 
 ```{r}
 # Verilerin net göç verisine dönüştürülmesi
-
 goc_data$NET_SAYI <- NA
 
 for (i in unique(goc_data$YIL)){
-  
   for (j in unique(goc_data$FROM_Cografi)){
-    
     for (m in unique(goc_data$TO_Cografi)){
-      
       goc_data$NET_SAYI[goc_data$YIL == i & goc_data$FROM_Cografi == j & 
                           goc_data$TO_Cografi == m] <- goc_data$SAYI[goc_data$YIL == i & goc_data$FROM_Cografi == j & 
                                                                            goc_data$TO_Cografi == m] -
@@ -132,26 +126,21 @@ for (i in unique(goc_data$YIL)){
                             goc_data$TO_Cografi == j]
       
     }
-    
   }
-  
 }
 ```
 
 
 ```{r}
 # Göç verilerinde yalnızca pozitif değerlere sahip olan bölgeleri almak verilen net göçü görmek için yeterlidir
-
 goc_data <- goc_data %>% filter(NET_SAYI > 0) %>% select(-SAYI) %>%
   filter(YIL == 2017)
 
 # Her bir coğrafi bölgeye indeks numarasının verilmesi
-
 index_nums <- data.frame(bolge = unique(nuts3_goc_temiz$FROM_Cografi), FROM_index = c(0:6),
                          TO_index = c(7:13))
 
 # Indeks numaralarının data frame e yerleştirilmesi
-
 goc_data <- goc_data %>% 
   left_join(select(index_nums, -TO_index), by = c("FROM_Cografi" = "bolge")) %>% 
   left_join(select(index_nums, -FROM_index), by = c("TO_Cografi" = "bolge")) %>%
@@ -163,7 +152,6 @@ library(plotly)
 library(paletteer)
 
 # Sankey diyagramının oluşturulması
-
 plot_ly(
   type = "sankey",
 

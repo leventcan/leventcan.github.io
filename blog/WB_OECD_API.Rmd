@@ -1,5 +1,5 @@
 ---
-title: "Dünya Bankası ve OECD API'si İle Veri Analizi"
+title: "Dünya Bankası, OECD ve Eurostat API'lerine Erişim"
 description: "Dünya Bankası ve OECD API'lerine R üzerinden erişim sağlanarak uluslararası ölçekte, bir çok gösterge detayında veriye kolayca erişilebilmekte ve analiz gerçekleştirilebilmektedir"
 date: '2017-11-03'
 type: "post"
@@ -39,7 +39,7 @@ knitr::opts_chunk$set(echo = TRUE,warning=FALSE, message=FALSE, collapse =TRUE, 
 htmltools::tagList(rmarkdown::html_dependency_font_awesome())
 ```
 
-## Dünya Bankası ve OECD API'leri
+## Uluslararası Ekonomik Kuruluşlar ve API'leri
 
 API sistemi (Application Programing Interfaces - Uygulama Programlama Arayüzleri) en kısa hali ile iki yazılımın veya veritabanının birbiri ile sorunsuz çalışabilmesini, en sağlıklı bir şekilde birbiri ile iletişime geçmesini, birbiri ile veri alışverişi yapabilmesini  sağlayan yapılara verilen isimdir.
 
@@ -47,9 +47,8 @@ R ortamı için kullanıcılar tarafından geliştirilen çeşitli paketleri kul
 
 Bu blog paylaşımımda ekonomistler için çok kritik konumda olan Dünya Bankası ve OECD kuruluşlarının sunduğu API hizmetleri için geliştirilen R paketlerinin kullanımını inceleyeceğim.
 
-Konuya detaylı olarak ilgi duyan kişilere [DataCamp](https://www.datacamp.com/courses/working-with-web-data-in-r) tarafından sunulan bu  kursu şiddetle tavsiye ederim.
 
-## "Data360r" Paketi ve Kullanımı
+## Dünya Bankası-API
 
 
 Dünya Bankası'nın geliştirmiş API ile bir çok ülke detayında farklı sektör ve temadaki veriye kolaylık ulaşılabilmektedir. [Data360r](https://github.com/mrpsonglao/data360r) paketi ile bu işlem gerçekleştirilmektedir. Yapacağım bu çalışmada da veri manipülasyon işlemlerinde `dplyr` ve `tidyr` paketlerini, görselleme işlemlerinde ise `ggplot2` paketini kullanacağım.
@@ -146,7 +145,7 @@ ggplotly(
 
 ```
 
-##"OECD" Paketi ve Kullanımı
+## OECD-API
 
 OECD verilerine ise [OECD](https://cran.r-project.org/web/packages/OECD/index.html) paketi ile  erişilebilebilmektedir. 
 
@@ -213,4 +212,68 @@ ggplotly(
   
 
 ```
+<br>
+
+## Eurostat-API
+
+Eurostat'ın API kanalıyla sunduğu verilere erişmek için `eurostat` paketi kullanılabilmektedir. Eurostat veritabanlarında yer alan verilere ilişkin metaveriye erişmek için aşağıdaki fonksiyon kullanılabilir.
+
+```{r}
+library(eurostat)
+library(stringr)
+
+toc <- get_eurostat_toc()
+
+#Metaverinin incelenmesi
+colnames(toc)
+head(toc)
+```
+
+Metaverinin yer aldığı `toc` dataframe nesnesi RStudio'dan da detaylı incelenip, hangi verilerin olup olmadığı görülebilir. Kullanılacak olan değişken belirlendikten sonra `toc` dataframe dosyasından hangi değişkene ilişkin `code` değerinin elde edilmesi gerekmektedir. Dataframe'i inceledikten sonra NUTS3 bölgelerine göre nüfus yoğunluğu verisetini kullanmaya karar veriyorum.
+
+```{r}
+id <- "demo_r_d3dens"
+dat <- get_eurostat(id, time_format = "num")
+head(dat)
+```
+
+Verisetinde farklı mekansal ölçekte ve yıllara göre kırınımlar bulunmaktadır. Bu sebeple verisetini yalnızca 2016 yılı ve NUTS-3 bölgeleri olacak şekilde filtreliyorum.
+
+```{r}
+dat <- dat %>% filter(time == 2016) %>%
+  filter(str_length(geo)==5) 
+```
+
+Yukarıda gösterdiğim diğer örneklerden farklı olarak bu örnekte veriyi harita üzerinde görselleştirmek istiyorum. Fakat harita üzerinde görselleştirmeden önce Avrupa ülkelerinin NUTS-3 ölçeğinde vektör harita verisine ihtiyaç bulunmaktadır.
+
+AB komisyonunun mekansal verilerden sorumlu [GISCO](https://ec.europa.eu/eurostat/web/gisco) biriminin mekansal verilerine de `eurostat` paketi aracılığıyla ulaşılabilmektedir.
+
+```{r}
+eu_map <- get_eurostat_geospatial(output_class = "sf", resolution = "60", 
+                                  nuts_level = 3)
+```
+
+Verideki değerler sürekli sayısal değerlerdir. Harita üzerinde görselleştirmede kolaylık sağlaması için bu değerleri belirli aralıklarda grupluyorum.
+
+```{r}
+eu_map <- eu_map %>% left_join(dat, by = c("NUTS_ID" = "geo"))
+eu_map$category <- cut(eu_map$values, c(0,25,50,100,150,200,500,1000,5000,20000))
+
+```
+
+Artık geriye ggplot2 ile verilerin görselleştirilmesi kalmaktadır.
+
+```{r}
+
+ggplot(data = eu_map) + geom_sf(aes(fill = category)) +
+  coord_sf(xlim=c(-12,44), ylim=c(35,67)) +
+  scale_fill_brewer(palette = "RdPu", name = "") +
+  theme(legend.position = c(0.9,0.7),
+        legend.background =  element_rect(fill = "transparent"),
+        axis.text=element_blank(),
+        axis.ticks = element_blank()) +
+  ggtitle("NUTS 3 Bölgelerine Göre Nüfus Yoğunluğu")
+```
+
+
 
