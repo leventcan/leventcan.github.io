@@ -246,6 +246,13 @@ dat <- dat %>% filter(time == 2016) %>%
   filter(str_length(geo)==5) 
 ```
 
+```{r,message = FALSE}
+#Şehir adlarının yerleştirilmesi
+city_labels <- label_eurostat(dat, fix_duplicated = T)
+dat$geo_name <- city_labels$geo
+```
+
+
 Yukarıda gösterdiğim diğer örneklerden farklı olarak bu örnekte veriyi harita üzerinde görselleştirmek istiyorum. Fakat harita üzerinde görselleştirmeden önce Avrupa ülkelerinin NUTS-3 ölçeğinde vektör harita verisine ihtiyaç bulunmaktadır.
 
 AB komisyonunun mekansal verilerden sorumlu [GISCO](https://ec.europa.eu/eurostat/web/gisco) biriminin mekansal verilerine de `eurostat` paketi aracılığıyla ulaşılabilmektedir.
@@ -275,6 +282,39 @@ ggplot(data = eu_map) + geom_sf(aes(fill = category)) +
         axis.text=element_blank(),
         axis.ticks = element_blank()) +
   ggtitle("NUTS 3 Bölgelerine Göre Nüfus Yoğunluğu")
+```
+
+### Bonus!!! İnteraktif Harita
+
+
+```{r}
+library(leaflet)
+
+bins <- c(0,25,50,100,150,200,500,1000,5000,20000, Inf)
+pal2 <- colorBin("plasma",  domain = eu_map$values, bins = bins,
+                 reverse = TRUE)
+
+labels <- sprintf(
+  "<strong>%s</strong><br/>Km2 başına düşen kişi sayısı: %g",
+  eu_map$geo_name, eu_map$values) %>% lapply(htmltools::HTML)
+
+leaflet(width = 720) %>% addPolygons(data= eu_map, color = "#444444", weight = 1, smoothFactor = 0.5, dashArray="",
+              opacity = 1.0, fillOpacity = 0.7, fillColor = ~pal2(eu_map$values),
+              highlightOptions = highlightOptions(color = "white", weight = 2,
+                                                  dashArray = "",
+                                                  fillOpacity = 1,
+                                                  bringToFront = TRUE),
+              label = labels,
+              labelOptions = labelOptions(
+                style = list("font-weight" = "normal", padding = "3px 8px"),
+                textsize = "12px",
+                direction = "auto"))  %>% 
+  
+   addLegend(pal = pal2, values = eu_map$values, opacity = 0.7, title = NULL,
+    position = "topright") %>%
+  addProviderTiles(providers$CartoDB.Positron) %>%
+  setView(lng = 20.508074,lat = 48.552978, zoom = 3)
+  
 ```
 
 
