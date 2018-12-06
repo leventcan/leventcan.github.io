@@ -18,7 +18,7 @@
       
       <guid>/blog/world-bank/</guid>
       <description>body {text-align: justify}Uluslararası Ekonomik Kuruluşlar ve API’leriAPI sistemi (Application Programing Interfaces - Uygulama Programlama Arayüzleri) en kısa hali ile iki yazılımın veya veritabanının birbiri ile sorunsuz çalışabilmesini, en sağlıklı bir şekilde birbiri ile iletişime geçmesini, birbiri ile veri alışverişi yapabilmesini sağlayan yapılara verilen isimdir.
-R ortamı için kullanıcılar tarafından geliştirilen çeşitli paketleri kullanarak bazı kurum ve veri sahiplerinin verilerine tarafından yalnızca bir kaç satır kodla kolayca ulaşılabilmektedir.</description>
+R ekosistemi içerisinde geliştirilen bazı paketler kullanarak çeşitli kurum ve veri sahiplerinin ürettiği verilere API’ler kanalıyla kolayca erişilebilmektedir.</description>
     </item>
     
   </channel>
