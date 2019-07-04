@@ -50,6 +50,7 @@ htmltools::tagList(rmarkdown::html_dependency_font_awesome())
 
 ## Veri Hazırlık Aşaması
 
+
 TÜİK'in websitesindeki [veritabanları](http://www.tuik.gov.tr/PreTabloArama.do?metod=search&araType=vt) bölümünde iller arasıdaki göç matrisi, istenilen yıl detayında oluşturulup indirilebilmektedir.
 
 
@@ -57,12 +58,12 @@ TÜİK'in websitesindeki [veritabanları](http://www.tuik.gov.tr/PreTabloArama.d
 library(readxl)
 
 #Verilerin olduğu excel dosyasının içe aktarılması
-nuts3_goc <- read_excel("C:/--DOSYALARIM/R-Projects/Github_Page/website-hugo/static/Veri/nuts3_goc.xlsx", sheet = "data")
+nuts3_goc <- read_excel("C:/Users/leventcan.gultekin/Documents/--DOSYALARIM/R-Projects/Github_Page/website-hugo/static/Veri/nuts3_goc.xlsx", sheet = "data")
 
 nuts3_goc$YIL <- as.integer(nuts3_goc$YIL)
 
 #İBBS tipolojisi ile eşleştirme yapmak için
-trkod <- read_excel("C:/--DOSYALARIM/R-Projects/Github_Page/website-hugo/static/Veri/trkod.xlsx")
+trkod <- read_excel("C:/Users/leventcan.gultekin/Documents/--DOSYALARIM/R-Projects/Github_Page/website-hugo/static/Veri/trkod.xlsx")
 ```
 
 ```{r,eval=FALSE}
@@ -85,8 +86,6 @@ head(nuts3_goc)
 ```
 
 ´nuts3_goc´ dataframe objesinde belirli bir yılda her bir ilden diğer ile olan göç sayısı gösterilmektedir. Söz konusu matristeki (R'daki matris mantığında değil) göç veren iller satır olarak, göç alan iller ise kolon olarak gösterilmektedir. Fakat R ile ilgili paketlerin fonksiyonları genellikle <mark>tidy</mark> yani unpivot durumunda olan verileri girdi olarak kabul etmektedir. Bu yüzden ´nuts3_goc´ objesininde `tidyr` paketi ile gerekli dönüşüm işlemlerinin yapılması gerekmektedir.
-
-
 
 
 ```{r}
@@ -134,7 +133,7 @@ for (i in unique(goc_data$YIL)){
 ```{r}
 # Göç verilerinde yalnızca pozitif değerlere sahip olan bölgeleri almak verilen net göçü görmek için yeterlidir
 goc_data <- goc_data %>% filter(NET_SAYI > 0) %>% select(-SAYI) %>%
-  filter(YIL == 2017)
+  filter(YIL == 2018)
 
 # Her bir coğrafi bölgeye indeks numarasının verilmesi
 index_nums <- data.frame(bolge = unique(nuts3_goc_temiz$FROM_Cografi), FROM_index = c(0:6),
@@ -192,5 +191,5 @@ Yukarıdaki grafikte yalnızca 2017 yılındaki coğrafi bölgeler arasındaki n
 
 ### İnteraktif Uygulama
 
-<iframe width="700" height="600" scrolling="no" frameborder="no"  src="https://leventcan.shinyapps.io/TR_Goc_Shiny2/"> </iframe>
+<iframe width="700" height="600" scrolling="no" frameborder="no"  src="https://leventcan.shinyapps.io/turkey-migration/"> </iframe>
 

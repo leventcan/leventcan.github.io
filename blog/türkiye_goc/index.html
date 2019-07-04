@@ -15,22 +15,8 @@
 <meta property="og:description" content="Bu blog paylaşımımda Türkiye&#39;deki iller arası göç verilerinden dinamik Sankey akış grafiğinin oluşturulması ilgili süreçlere değineceğim" />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="/blog/t%C3%BCrkiye_goc/" />
-
-
-
 <meta property="article:published_time" content="2018-07-15T00:00:00&#43;00:00"/>
-
 <meta property="article:modified_time" content="2018-07-15T00:00:00&#43;00:00"/>
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -57,11 +43,11 @@
 
 
     
-    <link rel="stylesheet" href="/css/reset.css?t=2018-12-07%2001%3a49%3a10.6128325%20%2b0300%20%2b03%20m%3d%2b0.438971301">
-    <link rel="stylesheet" href="/css/pygments.css?t=2018-12-07%2001%3a49%3a10.6128325%20%2b0300%20%2b03%20m%3d%2b0.438971301">
-    <link rel="stylesheet" href="/css/main.css?t=2018-12-07%2001%3a49%3a10.6128325%20%2b0300%20%2b03%20m%3d%2b0.438971301">
+    <link rel="stylesheet" href="/css/reset.css?t=2019-07-04%2012%3a09%3a58.6541308%20%2b0300%20%2b03%20m%3d%2b0.478663101">
+    <link rel="stylesheet" href="/css/pygments.css?t=2019-07-04%2012%3a09%3a58.6541308%20%2b0300%20%2b03%20m%3d%2b0.478663101">
+    <link rel="stylesheet" href="/css/main.css?t=2019-07-04%2012%3a09%3a58.6541308%20%2b0300%20%2b03%20m%3d%2b0.478663101">
     
-        <link rel="stylesheet" href="/css/override.css?t=2018-12-07%2001%3a49%3a10.6128325%20%2b0300%20%2b03%20m%3d%2b0.438971301">
+        <link rel="stylesheet" href="/css/override.css?t=2019-07-04%2012%3a09%3a58.6541308%20%2b0300%20%2b03%20m%3d%2b0.478663101">
     
 
 
@@ -180,17 +166,17 @@
 </div>
 
             <div class="markdown">
-                <link href="/rmarkdown-libs/font-awesome/css/fa-svg-with-js.css" rel="stylesheet" />
-<script src="/rmarkdown-libs/font-awesome/js/fontawesome-all.min.js"></script>
-<script src="/rmarkdown-libs/font-awesome/js/fa-v4-shims.min.js"></script>
+                
+<link href="/rmarkdown-libs/font-awesome/css/all.css" rel="stylesheet" />
+<link href="/rmarkdown-libs/font-awesome/css/v4-shims.css" rel="stylesheet" />
 <script src="/rmarkdown-libs/htmlwidgets/htmlwidgets.js"></script>
 <script src="/rmarkdown-libs/plotly-binding/plotly.js"></script>
 <script src="/rmarkdown-libs/typedarray/typedarray.min.js"></script>
 <script src="/rmarkdown-libs/jquery/jquery.min.js"></script>
 <link href="/rmarkdown-libs/crosstalk/css/crosstalk.css" rel="stylesheet" />
 <script src="/rmarkdown-libs/crosstalk/js/crosstalk.min.js"></script>
-<link href="/rmarkdown-libs/plotlyjs/plotly-htmlwidgets.css" rel="stylesheet" />
-<script src="/rmarkdown-libs/plotlyjs/plotly-latest.min.js"></script>
+<link href="/rmarkdown-libs/plotly-htmlwidgets-css/plotly-htmlwidgets.css" rel="stylesheet" />
+<script src="/rmarkdown-libs/plotly-main/plotly-latest.min.js"></script>
 
 
 <style>
@@ -214,12 +200,12 @@ trkod &lt;- read_excel(&quot;trkod.xlsx&quot;)</code></pre>
 ## # A tibble: 6 x 83
 ##     YIL FROM_IL Adana Adıyaman Afyonkarahisar  Ağrı Aksaray Amasya Ankara
 ##   &lt;int&gt; &lt;chr&gt;   &lt;dbl&gt;    &lt;dbl&gt;          &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;
-## 1  2015 Adana       0      816            342   263     389    159   3764
-## 2  2015 Adıyam~   905        0             92   136      68     40    986
-## 3  2015 Afyonk~   235       67              0   118      65     62   1921
-## 4  2015 Ağrı      247      129            189     0      95     89   2749
-## 5  2015 Aksaray   459       54            140    39       0     50   1956
-## 6  2015 Amasya    129       40             48   101      29      0   1982
+## 1  2013 Adana       0      811            333   243     455     91   3420
+## 2  2013 Adıyam~   975        0            104   104      57     67    817
+## 3  2013 Afyonk~   269       46              0    97      89     53   1837
+## 4  2013 Ağrı      243      125            149     0      59     94   2376
+## 5  2013 Aksaray   421       72            118    41       0     40   1806
+## 6  2013 Amasya     77       32             62    63      27      0   1785
 ## # ... with 74 more variables: Antalya &lt;dbl&gt;, Ardahan &lt;dbl&gt;, Artvin &lt;dbl&gt;,
 ## #   Aydın &lt;dbl&gt;, Balıkesir &lt;dbl&gt;, Bartın &lt;dbl&gt;, Batman &lt;dbl&gt;,
 ## #   Bayburt &lt;dbl&gt;, Bilecik &lt;dbl&gt;, Bingöl &lt;dbl&gt;, Bitlis &lt;dbl&gt;, Bolu &lt;dbl&gt;,
@@ -274,7 +260,7 @@ for (i in unique(goc_data$YIL)){
 }</code></pre>
 <pre class="r"><code># Göç verilerinde yalnızca pozitif değerlere sahip olan bölgeleri almak verilen net göçü görmek için yeterlidir
 goc_data &lt;- goc_data %&gt;% filter(NET_SAYI &gt; 0) %&gt;% select(-SAYI) %&gt;%
-  filter(YIL == 2017)
+  filter(YIL == 2018)
 
 # Her bir coğrafi bölgeye indeks numarasının verilmesi
 index_nums &lt;- data.frame(bolge = unique(nuts3_goc_temiz$FROM_Cografi), FROM_index = c(0:6),
@@ -321,12 +307,12 @@ plot_ly(
     )
     
   )</code></pre>
-<div id="13d58769b5d7e" style="width:672px;height:480px;" class="plotly html-widget"></div>
-<script type="application/json" data-for="13d58769b5d7e">{"x":{"visdat":{"13d58791177c2":["function () ","plotlyVisDat"]},"cur_data":"13d58791177c2","attrs":{"13d58791177c2":{"orientation":"h","valuesuffix":" Kişi","valueformat":".0f","node":{"label":["Akdeniz","Güneydoğu Anadolu","Ege","Doğu Anadolu","İç Anadolu","Karadeniz","Marmara","Akdeniz","Güneydoğu Anadolu","Ege","Doğu Anadolu","İç Anadolu","Karadeniz","Marmara"],"color":["#5050FF","#CE3D32","#749B58","#F0E685","#466983","#BA6338","#5DB1DD","#5050FF","#CE3D32","#749B58","#F0E685","#466983","#BA6338","#5DB1DD"],"pad":15,"thickness":20,"line":{"color":"black","width":0.5}},"link":{"source":[0,0,0,0,0,0,1,1,1,1,1,3,3,3,3,4,4,5,5,5,6],"target":[8,9,10,11,12,13,9,10,11,12,13,9,11,12,13,9,13,9,11,13,9],"value":[4359,8899,1429,12534,2564,15489,7431,1726,3920,669,13756,12535,10247,3014,54499,3389,1185,3647,11462,26429,11166],"value.1":[4359,8899,1429,12534,2564,15489,7431,1726,3920,669,13756,12535,10247,3014,54499,3389,1185,3647,11462,26429,11166]},"alpha":1,"sizes":[10,100],"type":"sankey"}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"title":"Türkiye'de Coğrafi Bölgeler Arası Göç Akımları","font":{"size":10},"hovermode":"closest","showlegend":false},"source":"A","config":{"modeBarButtonsToAdd":[{"name":"Collaborate","icon":{"width":1000,"ascent":500,"descent":-50,"path":"M487 375c7-10 9-23 5-36l-79-259c-3-12-11-23-22-31-11-8-22-12-35-12l-263 0c-15 0-29 5-43 15-13 10-23 23-28 37-5 13-5 25-1 37 0 0 0 3 1 7 1 5 1 8 1 11 0 2 0 4-1 6 0 3-1 5-1 6 1 2 2 4 3 6 1 2 2 4 4 6 2 3 4 5 5 7 5 7 9 16 13 26 4 10 7 19 9 26 0 2 0 5 0 9-1 4-1 6 0 8 0 2 2 5 4 8 3 3 5 5 5 7 4 6 8 15 12 26 4 11 7 19 7 26 1 1 0 4 0 9-1 4-1 7 0 8 1 2 3 5 6 8 4 4 6 6 6 7 4 5 8 13 13 24 4 11 7 20 7 28 1 1 0 4 0 7-1 3-1 6-1 7 0 2 1 4 3 6 1 1 3 4 5 6 2 3 3 5 5 6 1 2 3 5 4 9 2 3 3 7 5 10 1 3 2 6 4 10 2 4 4 7 6 9 2 3 4 5 7 7 3 2 7 3 11 3 3 0 8 0 13-1l0-1c7 2 12 2 14 2l218 0c14 0 25-5 32-16 8-10 10-23 6-37l-79-259c-7-22-13-37-20-43-7-7-19-10-37-10l-248 0c-5 0-9-2-11-5-2-3-2-7 0-12 4-13 18-20 41-20l264 0c5 0 10 2 16 5 5 3 8 6 10 11l85 282c2 5 2 10 2 17 7-3 13-7 17-13z m-304 0c-1-3-1-5 0-7 1-1 3-2 6-2l174 0c2 0 4 1 7 2 2 2 4 4 5 7l6 18c0 3 0 5-1 7-1 1-3 2-6 2l-173 0c-3 0-5-1-8-2-2-2-4-4-4-7z m-24-73c-1-3-1-5 0-7 2-2 3-2 6-2l174 0c2 0 5 0 7 2 3 2 4 4 5 7l6 18c1 2 0 5-1 6-1 2-3 3-5 3l-174 0c-3 0-5-1-7-3-3-1-4-4-5-6z"},"click":"function(gd) { \n        // is this being viewed in RStudio?\n        if (location.search == '?viewer_pane=1') {\n          alert('To learn about plotly for collaboration, visit:\\n https://cpsievert.github.io/plotly_book/plot-ly-for-collaboration.html');\n        } else {\n          window.open('https://cpsievert.github.io/plotly_book/plot-ly-for-collaboration.html', '_blank');\n        }\n      }"}],"cloud":false},"data":[{"orientation":"h","valuesuffix":" Kişi","valueformat":".0f","node":{"label":["Akdeniz","Güneydoğu Anadolu","Ege","Doğu Anadolu","İç Anadolu","Karadeniz","Marmara","Akdeniz","Güneydoğu Anadolu","Ege","Doğu Anadolu","İç Anadolu","Karadeniz","Marmara"],"color":["#5050FF","#CE3D32","#749B58","#F0E685","#466983","#BA6338","#5DB1DD","#5050FF","#CE3D32","#749B58","#F0E685","#466983","#BA6338","#5DB1DD"],"pad":15,"thickness":20,"line":{"color":"black","width":0.5}},"link":{"source":[0,0,0,0,0,0,1,1,1,1,1,3,3,3,3,4,4,5,5,5,6],"target":[8,9,10,11,12,13,9,10,11,12,13,9,11,12,13,9,13,9,11,13,9],"value":[4359,8899,1429,12534,2564,15489,7431,1726,3920,669,13756,12535,10247,3014,54499,3389,1185,3647,11462,26429,11166],"value.1":[4359,8899,1429,12534,2564,15489,7431,1726,3920,669,13756,12535,10247,3014,54499,3389,1185,3647,11462,26429,11166]},"type":"sankey","textfont":{"fillcolor":"rgba(31,119,180,1)","color":"rgba(31,119,180,1)"},"frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1}},"base_url":"https://plot.ly"},"evals":["config.modeBarButtonsToAdd.0.click"],"jsHooks":{"render":[{"code":"function(el, x) { var ctConfig = crosstalk.var('plotlyCrosstalkOpts').set({\"on\":\"plotly_click\",\"persistent\":false,\"dynamic\":false,\"selectize\":false,\"opacityDim\":0.2,\"selected\":{\"opacity\":1}}); }","data":null}]}}</script>
+<div id="htmlwidget-1" style="width:672px;height:480px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-1">{"x":{"visdat":{"275c496d5e89":["function () ","plotlyVisDat"]},"cur_data":"275c496d5e89","attrs":{"275c496d5e89":{"orientation":"h","valuesuffix":" Kişi","valueformat":".0f","node":{"label":["Akdeniz","Güneydoğu Anadolu","Ege","Doğu Anadolu","İç Anadolu","Karadeniz","Marmara","Akdeniz","Güneydoğu Anadolu","Ege","Doğu Anadolu","İç Anadolu","Karadeniz","Marmara"],"color":["#5050FF","#CE3D32","#749B58","#F0E685","#466983","#BA6338","#5DB1DD","#5050FF","#CE3D32","#749B58","#F0E685","#466983","#BA6338","#5DB1DD"],"pad":15,"thickness":20,"line":{"color":"black","width":0.5}},"link":{"source":[0,0,0,0,0,0,1,1,1,1,1,3,3,3,3,4,4,5,6,6,6],"target":[8,9,10,11,12,13,9,10,11,12,13,9,11,12,13,9,12,9,9,11,12],"value":[860,6540,7217,15591,3586,8561,6940,4021,2703,503,9888,6880,3674,2475,833,7977,25516,1385,21708,19498,131179],"value.1":[860,6540,7217,15591,3586,8561,6940,4021,2703,503,9888,6880,3674,2475,833,7977,25516,1385,21708,19498,131179]},"alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"sankey"}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"title":"Türkiye'de Coğrafi Bölgeler Arası Göç Akımları","font":{"size":10},"hovermode":"closest","showlegend":false},"source":"A","config":{"modeBarButtonsToAdd":[{"name":"Collaborate","icon":{"width":1000,"ascent":500,"descent":-50,"path":"M487 375c7-10 9-23 5-36l-79-259c-3-12-11-23-22-31-11-8-22-12-35-12l-263 0c-15 0-29 5-43 15-13 10-23 23-28 37-5 13-5 25-1 37 0 0 0 3 1 7 1 5 1 8 1 11 0 2 0 4-1 6 0 3-1 5-1 6 1 2 2 4 3 6 1 2 2 4 4 6 2 3 4 5 5 7 5 7 9 16 13 26 4 10 7 19 9 26 0 2 0 5 0 9-1 4-1 6 0 8 0 2 2 5 4 8 3 3 5 5 5 7 4 6 8 15 12 26 4 11 7 19 7 26 1 1 0 4 0 9-1 4-1 7 0 8 1 2 3 5 6 8 4 4 6 6 6 7 4 5 8 13 13 24 4 11 7 20 7 28 1 1 0 4 0 7-1 3-1 6-1 7 0 2 1 4 3 6 1 1 3 4 5 6 2 3 3 5 5 6 1 2 3 5 4 9 2 3 3 7 5 10 1 3 2 6 4 10 2 4 4 7 6 9 2 3 4 5 7 7 3 2 7 3 11 3 3 0 8 0 13-1l0-1c7 2 12 2 14 2l218 0c14 0 25-5 32-16 8-10 10-23 6-37l-79-259c-7-22-13-37-20-43-7-7-19-10-37-10l-248 0c-5 0-9-2-11-5-2-3-2-7 0-12 4-13 18-20 41-20l264 0c5 0 10 2 16 5 5 3 8 6 10 11l85 282c2 5 2 10 2 17 7-3 13-7 17-13z m-304 0c-1-3-1-5 0-7 1-1 3-2 6-2l174 0c2 0 4 1 7 2 2 2 4 4 5 7l6 18c0 3 0 5-1 7-1 1-3 2-6 2l-173 0c-3 0-5-1-8-2-2-2-4-4-4-7z m-24-73c-1-3-1-5 0-7 2-2 3-2 6-2l174 0c2 0 5 0 7 2 3 2 4 4 5 7l6 18c1 2 0 5-1 6-1 2-3 3-5 3l-174 0c-3 0-5-1-7-3-3-1-4-4-5-6z"},"click":"function(gd) { \n        // is this being viewed in RStudio?\n        if (location.search == '?viewer_pane=1') {\n          alert('To learn about plotly for collaboration, visit:\\n https://cpsievert.github.io/plotly_book/plot-ly-for-collaboration.html');\n        } else {\n          window.open('https://cpsievert.github.io/plotly_book/plot-ly-for-collaboration.html', '_blank');\n        }\n      }"}],"cloud":false},"data":[{"orientation":"h","valuesuffix":" Kişi","valueformat":".0f","node":{"label":["Akdeniz","Güneydoğu Anadolu","Ege","Doğu Anadolu","İç Anadolu","Karadeniz","Marmara","Akdeniz","Güneydoğu Anadolu","Ege","Doğu Anadolu","İç Anadolu","Karadeniz","Marmara"],"color":["#5050FF","#CE3D32","#749B58","#F0E685","#466983","#BA6338","#5DB1DD","#5050FF","#CE3D32","#749B58","#F0E685","#466983","#BA6338","#5DB1DD"],"pad":15,"thickness":20,"line":{"color":"black","width":0.5}},"link":{"source":[0,0,0,0,0,0,1,1,1,1,1,3,3,3,3,4,4,5,6,6,6],"target":[8,9,10,11,12,13,9,10,11,12,13,9,11,12,13,9,12,9,9,11,12],"value":[860,6540,7217,15591,3586,8561,6940,4021,2703,503,9888,6880,3674,2475,833,7977,25516,1385,21708,19498,131179],"value.1":[860,6540,7217,15591,3586,8561,6940,4021,2703,503,9888,6880,3674,2475,833,7977,25516,1385,21708,19498,131179]},"type":"sankey","frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"base_url":"https://plot.ly"},"evals":["config.modeBarButtonsToAdd.0.click"],"jsHooks":[]}</script>
 <p>Yukarıdaki grafikte yalnızca 2017 yılındaki coğrafi bölgeler arasındaki net göç akımları görülmektedir. Aşağıda yer alan Shiny uygulmasından diğer yıllara ilişkim gösterimde otomatik olarak hesaplanıp oluşturulmaktadır.</p>
 <div id="interaktif-uygulama" class="section level3">
 <h3>İnteraktif Uygulama</h3>
-<iframe width="700" height="600" scrolling="no" frameborder="no" src="https://leventcan.shinyapps.io/TR_Goc_Shiny2/">
+<iframe width="700" height="600" scrolling="no" frameborder="no" src="https://leventcan.shinyapps.io/turkey-migration/">
 </iframe>
 </div>
 </div>
@@ -337,12 +323,16 @@ plot_ly(
 </section>
 
 
-<script>
-window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
-ga('create', 'UA-123-45', 'auto');
-ga('send', 'pageview');
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-123-45', 'auto');
+	
+	ga('send', 'pageview');
+}
 </script>
-<script async src='//www.google-analytics.com/analytics.js'></script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
 
 
 
