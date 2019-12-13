@@ -1,6 +1,6 @@
 ---
-title: "Türkiye'de Bölgeler Arası Göç Akışları"
-description: "Bu blog paylaşımımda Türkiye'deki iller arası göç verilerinden dinamik Sankey akış grafiğinin oluşturulması ilgili süreçlere değineceğim"
+title: "İnteraktif Sankey Diyagramlarını Oluşturma"
+description: "Bu blog paylaşımımda Türkiye'deki iller arası göç verilerini kullanarak dinamik Sankey akış grafiğinin oluşturulması ilgili süreçlere değineceğim"
 date: '2018-07-15'
 type: "post"
 tags: [
@@ -51,7 +51,7 @@ htmltools::tagList(rmarkdown::html_dependency_font_awesome())
 ## Veri Hazırlık Aşaması
 
 
-TÜİK'in websitesindeki [veritabanları](http://www.tuik.gov.tr/PreTabloArama.do?metod=search&araType=vt) bölümünde iller arasıdaki göç matrisi, istenilen yıl detayında oluşturulup indirilebilmektedir.
+Sankey genellikle ağ içerisinde yer alan belli birimler arasındaki geçişkenliği göstermek amacıyla kullanılmaktadır. Bu yazımda örnek olarak Türkiye'de coğrafi bölgeler arasıda göç akımlarını inceleyeceğim. TÜİK'in websitesindeki [veritabanları](http://www.tuik.gov.tr/PreTabloArama.do?metod=search&araType=vt) bölümünde iller arasıdaki göç matrisi,  yıl bazında oluşturulup indirilebilmektedir.
 
 
 ```{r, echo=FALSE}

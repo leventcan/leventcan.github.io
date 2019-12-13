@@ -21,47 +21,11 @@
     </item>
     
     <item>
-      <title>Dünya Bankası</title>
-      <link>/tags/d%C3%BCnya-bankas%C4%B1/</link>
-      <pubDate>Fri, 03 Nov 2017 00:00:00 +0000</pubDate>
-      
-      <guid>/tags/d%C3%BCnya-bankas%C4%B1/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Ggplot2</title>
-      <link>/tags/ggplot2/</link>
-      <pubDate>Fri, 03 Nov 2017 00:00:00 +0000</pubDate>
-      
-      <guid>/tags/ggplot2/</guid>
-      <description></description>
-    </item>
-    
-    <item>
       <title>Göç</title>
       <link>/tags/g%C3%B6%C3%A7/</link>
       <pubDate>Sun, 15 Jul 2018 00:00:00 +0000</pubDate>
       
       <guid>/tags/g%C3%B6%C3%A7/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Içerik Analizi</title>
-      <link>/tags/i%C3%A7erik-analizi/</link>
-      <pubDate>Sat, 31 Mar 2018 00:00:00 +0000</pubDate>
-      
-      <guid>/tags/i%C3%A7erik-analizi/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Leaflet</title>
-      <link>/tags/leaflet/</link>
-      <pubDate>Sun, 05 Nov 2017 00:00:00 +0000</pubDate>
-      
-      <guid>/tags/leaflet/</guid>
       <description></description>
     </item>
     
@@ -75,38 +39,11 @@
     </item>
     
     <item>
-      <title>Network Analizi</title>
-      <link>/tags/network-analizi/</link>
-      <pubDate>Sat, 31 Mar 2018 00:00:00 +0000</pubDate>
-      
-      <guid>/tags/network-analizi/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Oecd</title>
-      <link>/tags/oecd/</link>
-      <pubDate>Fri, 03 Nov 2017 00:00:00 +0000</pubDate>
-      
-      <guid>/tags/oecd/</guid>
-      <description></description>
-    </item>
-    
-    <item>
       <title>Plotly</title>
       <link>/tags/plotly/</link>
       <pubDate>Sun, 15 Jul 2018 00:00:00 +0000</pubDate>
       
       <guid>/tags/plotly/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>R Programlama Dili</title>
-      <link>/tags/r-programlama-dili/</link>
-      <pubDate>Sat, 31 Mar 2018 00:00:00 +0000</pubDate>
-      
-      <guid>/tags/r-programlama-dili/</guid>
       <description></description>
     </item>
     
@@ -129,20 +66,38 @@
     </item>
     
     <item>
-      <title>Sosyal Ağ Analizi</title>
-      <link>/tags/sosyal-a%C4%9F-analizi/</link>
-      <pubDate>Sat, 31 Mar 2018 00:00:00 +0000</pubDate>
+      <title>Veri Görselleştirme</title>
+      <link>/tags/veri-g%C3%B6rselle%C5%9Ftirme/</link>
+      <pubDate>Sun, 15 Jul 2018 00:00:00 +0000</pubDate>
       
-      <guid>/tags/sosyal-a%C4%9F-analizi/</guid>
+      <guid>/tags/veri-g%C3%B6rselle%C5%9Ftirme/</guid>
       <description></description>
     </item>
     
     <item>
-      <title>Tidytext</title>
-      <link>/tags/tidytext/</link>
+      <title>Network Analizi</title>
+      <link>/tags/network-analizi/</link>
       <pubDate>Sat, 31 Mar 2018 00:00:00 +0000</pubDate>
       
-      <guid>/tags/tidytext/</guid>
+      <guid>/tags/network-analizi/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>R programlama dili</title>
+      <link>/tags/r-programlama-dili/</link>
+      <pubDate>Sat, 31 Mar 2018 00:00:00 +0000</pubDate>
+      
+      <guid>/tags/r-programlama-dili/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Sosyal ağ analizi</title>
+      <link>/tags/sosyal-a%C4%9F-analizi/</link>
+      <pubDate>Sat, 31 Mar 2018 00:00:00 +0000</pubDate>
+      
+      <guid>/tags/sosyal-a%C4%9F-analizi/</guid>
       <description></description>
     </item>
     
@@ -156,7 +111,7 @@
     </item>
     
     <item>
-      <title>Twitter Api</title>
+      <title>Twitter API</title>
       <link>/tags/twitter-api/</link>
       <pubDate>Sat, 31 Mar 2018 00:00:00 +0000</pubDate>
       
@@ -174,11 +129,56 @@
     </item>
     
     <item>
-      <title>Veri Görselleştirme</title>
-      <link>/tags/veri-g%C3%B6rselle%C5%9Ftirme/</link>
-      <pubDate>Sun, 15 Jul 2018 00:00:00 +0000</pubDate>
+      <title>tidytext</title>
+      <link>/tags/tidytext/</link>
+      <pubDate>Sat, 31 Mar 2018 00:00:00 +0000</pubDate>
       
-      <guid>/tags/veri-g%C3%B6rselle%C5%9Ftirme/</guid>
+      <guid>/tags/tidytext/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>İçerik Analizi</title>
+      <link>/tags/i%C3%A7erik-analizi/</link>
+      <pubDate>Sat, 31 Mar 2018 00:00:00 +0000</pubDate>
+      
+      <guid>/tags/i%C3%A7erik-analizi/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Leaflet</title>
+      <link>/tags/leaflet/</link>
+      <pubDate>Sun, 05 Nov 2017 00:00:00 +0000</pubDate>
+      
+      <guid>/tags/leaflet/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Dünya Bankası</title>
+      <link>/tags/d%C3%BCnya-bankas%C4%B1/</link>
+      <pubDate>Fri, 03 Nov 2017 00:00:00 +0000</pubDate>
+      
+      <guid>/tags/d%C3%BCnya-bankas%C4%B1/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>OECD</title>
+      <link>/tags/oecd/</link>
+      <pubDate>Fri, 03 Nov 2017 00:00:00 +0000</pubDate>
+      
+      <guid>/tags/oecd/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>ggplot2</title>
+      <link>/tags/ggplot2/</link>
+      <pubDate>Fri, 03 Nov 2017 00:00:00 +0000</pubDate>
+      
+      <guid>/tags/ggplot2/</guid>
       <description></description>
     </item>
     

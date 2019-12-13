@@ -12,14 +12,13 @@
     
     
     <item>
-      <title>Türkiye&#39;de Bölgeler Arası Göç Akışları</title>
+      <title>İnteraktif Sankey Diyagramlarını Oluşturma</title>
       <link>/blog/t%C3%BCrkiye_goc/</link>
       <pubDate>Sun, 15 Jul 2018 00:00:00 +0000</pubDate>
       
       <guid>/blog/t%C3%BCrkiye_goc/</guid>
-      <description>body {text-align: justify}Veri Hazırlık AşamasıTÜİK’in websitesindeki veritabanları bölümünde iller arasıdaki göç matrisi, istenilen yıl detayında oluşturulup indirilebilmektedir.
-library(readxl)#Verilerin olduğu excel dosyasının içe aktarılmasınuts3_goc &amp;lt;- read_excel(&amp;quot;nuts3_goc.xlsx&amp;quot;, sheet = &amp;quot;data&amp;quot;)nuts3_goc$YIL &amp;lt;- as.integer(nuts3_goc$YIL)#İBBS tipolojisi ile eşleştirme yapmak içintrkod &amp;lt;- read_excel(&amp;quot;trkod.xlsx&amp;quot;)´nuts3_goc´ dataframe objesinde yer alan göç matrisinin görünümü aşağıdaki şekildedir.
-head(nuts3_goc)## # A tibble: 6 x 83## YIL FROM_IL Adana Adıyaman Afyonkarahisar Ağrı Aksaray Amasya Ankara## &amp;lt;int&amp;gt; &amp;lt;chr&amp;gt; &amp;lt;dbl&amp;gt; &amp;lt;dbl&amp;gt; &amp;lt;dbl&amp;gt; &amp;lt;dbl&amp;gt; &amp;lt;dbl&amp;gt; &amp;lt;dbl&amp;gt; &amp;lt;dbl&amp;gt;## 1 2013 Adana 0 811 333 243 455 91 3420## 2 2013 Adıyam~ 975 0 104 104 57 67 817## 3 2013 Afyonk~ 269 46 0 97 89 53 1837## 4 2013 Ağrı 243 125 149 0 59 94 2376## 5 2013 Aksaray 421 72 118 41 0 40 1806## 6 2013 Amasya 77 32 62 63 27 0 1785## # .</description>
+      <description>body {text-align: justify}Veri Hazırlık AşamasıSankey genellikle ağ içerisinde yer alan belli birimler arasındaki geçişkenliği göstermek amacıyla kullanılmaktadır. Bu yazımda örnek olarak Türkiye’de coğrafi bölgeler arasıda göç akımlarını inceleyeceğim. TÜİK’in websitesindeki veritabanları bölümünde iller arasıdaki göç matrisi, yıl bazında oluşturulup indirilebilmektedir.
+library(readxl)#Verilerin olduğu excel dosyasının içe aktarılmasınuts3_goc &amp;lt;- read_excel(&amp;quot;nuts3_goc.xlsx&amp;quot;, sheet = &amp;quot;data&amp;quot;)nuts3_goc$YIL &amp;lt;- as.integer(nuts3_goc$YIL)#İBBS tipolojisi ile eşleştirme yapmak içintrkod &amp;lt;- read_excel(&amp;quot;trkod.</description>
     </item>
     
     <item>
